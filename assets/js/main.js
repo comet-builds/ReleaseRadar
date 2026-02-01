@@ -17,13 +17,13 @@
             const ms = Store.state.refreshRate * multiplier;
 
             refreshTimer = setInterval(() => {
-                UI.refreshUI();
+                UI.refreshUI(true);
             }, ms);
         }
     };
 
     const manualRefresh = () => {
-        UI.refreshUI();
+        UI.refreshUI(true);
         setupAutoRefresh();
     };
 
@@ -58,7 +58,7 @@
         }
 
         Store.addRepo(parts[0], parts[1]);
-        UI.refreshUI();
+        UI.refreshUI(false);
         input.value = '';
         UI.toggleModal('add-modal');
     };
@@ -95,7 +95,7 @@
         });
 
         setupAutoRefresh();
-        UI.refreshUI();
+        UI.refreshUI(false);
 
         const modal = document.getElementById('settings-modal');
         modal.classList.remove('active');
@@ -138,7 +138,7 @@
             if (Store.importConfig(data)) {
                 UI.applyTheme();
                 UI.populateSettings();
-                UI.refreshUI();
+                UI.refreshUI(false);
                 setupAutoRefresh();
                 Utils.showToast('Configuration imported successfully.', 'success');
 
