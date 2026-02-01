@@ -30,7 +30,17 @@ globalThis.App.Store = (function() {
         state.theme = 'device';
     }
 
-    const saveState = () => localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    let saveHandle = null;
+    const requestIdleCallback = globalThis.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+    const cancelIdleCallback = globalThis.cancelIdleCallback || clearTimeout;
+
+    const saveState = () => {
+        if (saveHandle) cancelIdleCallback(saveHandle);
+        saveHandle = requestIdleCallback(() => {
+            localStorage.setItem(STATE_KEY, JSON.stringify(state));
+            saveHandle = null;
+        });
+    };
 
     const isValidApiKey = (key) => {
         if (!key) return true; // Empty is valid
