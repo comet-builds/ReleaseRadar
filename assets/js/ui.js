@@ -168,7 +168,7 @@ globalThis.App.UI = (function() {
         const refreshBtn = document.getElementById('refresh-btn');
 
         if (refreshBtn) refreshBtn.innerHTML = Utils.ICONS.REFRESH;
-        if (refreshBtn) refreshBtn.querySelector('svg').classList.add('animate-spin');
+        if (refreshBtn && forceRefresh) refreshBtn.querySelector('svg').classList.add('animate-spin');
 
         if (Store.state.projects.length === 0) {
             container.innerHTML = '';
@@ -215,7 +215,7 @@ globalThis.App.UI = (function() {
                 .forEach(c => container.appendChild(c));
         }
 
-        if (refreshBtn) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
+        if (refreshBtn && forceRefresh) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
     };
 
     const updateThemeControl = (activeTheme) => {
