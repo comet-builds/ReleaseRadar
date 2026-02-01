@@ -211,8 +211,10 @@ globalThis.App.UI = (function() {
             const cards = Array.from(existingCards.values());
             await Promise.allSettled(cards.map(c => renderProject(c, forceRefresh)));
 
+            const fragment = document.createDocumentFragment();
             cards.toSorted((a, b) => (Number(b.dataset.latest) || 0) - (Number(a.dataset.latest) || 0))
-                .forEach(c => container.appendChild(c));
+                .forEach(c => fragment.appendChild(c));
+            container.appendChild(fragment);
         }
 
         if (refreshBtn && forceRefresh) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
