@@ -207,8 +207,16 @@
 
     // Init
     const toastContainer = document.getElementById('toast-container');
-    if (toastContainer?.showPopover) {
-        toastContainer.showPopover();
+    if (toastContainer) {
+        try {
+            toastContainer.popover = "manual";
+        } catch (e) {
+            console.warn('Popover API not supported', e);
+        }
+
+        if (toastContainer.showPopover) {
+            toastContainer.showPopover();
+        }
     }
 
     UI.applyTheme();
