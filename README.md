@@ -8,7 +8,7 @@ ReleaseRadar is a browser‑only dashboard for tracking GitHub repository releas
 
 It runs entirely in the browser with no backend and no setup. Uses the public GitHub API.
 
-![Screenshot of the app in action](https://i.imgur.com/hDTKJCu.png)
+![Screenshot of the app in action](https://i.imgur.com/qFvhB8U.png)
 
 ## Release Handling
 
