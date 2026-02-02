@@ -151,12 +151,12 @@ globalThis.App.UI = (function() {
         return el;
     };
 
-    const renderProject = async (card) => {
+    const renderProject = async (card, forceRefresh = false) => {
         const { owner, name } = card.dataset;
         const content = card.querySelector('.content-area');
 
         try {
-            const { data, stable, pre } = await Github.fetchRepoData(owner, name);
+            const { data, stable, pre } = await Github.fetchRepoData(owner, name, forceRefresh);
 
             if (data.length) card.dataset.latest = new Date(data[0].published_at).getTime();
 
@@ -182,14 +182,14 @@ globalThis.App.UI = (function() {
         }
     };
 
-    const refreshUI = async () => {
+    const refreshUI = async (forceRefresh = false) => {
         const container = document.getElementById('projects-container');
         const emptyState = document.getElementById('empty-state');
         const headerAddBtn = document.getElementById('header-add-repo-btn');
         const refreshBtn = document.getElementById('refresh-btn');
 
         if (refreshBtn) refreshBtn.innerHTML = Utils.ICONS.REFRESH;
-        if (refreshBtn) refreshBtn.querySelector('svg').classList.add('animate-spin');
+        if (refreshBtn && forceRefresh) refreshBtn.querySelector('svg').classList.add('animate-spin');
 
         if (Store.state.projects.length === 0) {
             container.innerHTML = '';
@@ -232,11 +232,13 @@ globalThis.App.UI = (function() {
             const cards = Array.from(existingCards.values());
             await runConcurrently(cards, renderProject, 5);
 
+            const fragment = document.createDocumentFragment();
             cards.toSorted((a, b) => (Number(b.dataset.latest) || 0) - (Number(a.dataset.latest) || 0))
-                .forEach(c => container.appendChild(c));
+                .forEach(c => fragment.appendChild(c));
+            container.appendChild(fragment);
         }
 
-        if (refreshBtn) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
+        if (refreshBtn && forceRefresh) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
     };
 
     const updateThemeControl = (activeTheme) => {
