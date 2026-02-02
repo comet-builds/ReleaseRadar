@@ -4,8 +4,14 @@ globalThis.App.Github = (function() {
     const Store = globalThis.App.Store;
     const FETCH_LIMIT = 15;
     const GITHUB_API = 'https://api.github.com/repos/';
+    const cache = new Map();
 
-    const fetchRepoData = async (owner, name) => {
+    const fetchRepoData = async (owner, name, forceRefresh = false) => {
+        const cacheKey = `${owner.toLowerCase()}/${name.toLowerCase()}`;
+        if (!forceRefresh && cache.has(cacheKey)) {
+            return cache.get(cacheKey);
+        }
+
         const headers = { 'Accept': 'application/vnd.github.v3+json' };
         if (Store.state.apiKey) headers['Authorization'] = `token ${Store.state.apiKey}`;
 
@@ -32,7 +38,10 @@ globalThis.App.Github = (function() {
                 console.warn('Fallback fetch failed', e);
             }
         }
-        return { data, stable, pre };
+
+        const result = { data, stable, pre };
+        cache.set(cacheKey, result);
+        return result;
     };
 
     return { fetchRepoData };

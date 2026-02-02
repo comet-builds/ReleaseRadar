@@ -230,7 +230,7 @@ globalThis.App.UI = (function() {
             });
 
             const cards = Array.from(existingCards.values());
-            await runConcurrently(cards, renderProject, 5);
+            await runConcurrently(cards, renderProject, 5, forceRefresh);
 
             const fragment = document.createDocumentFragment();
             cards.toSorted((a, b) => (Number(b.dataset.latest) || 0) - (Number(a.dataset.latest) || 0))
