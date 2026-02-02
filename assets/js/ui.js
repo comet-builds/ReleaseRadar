@@ -7,6 +7,27 @@ globalThis.App.UI = (function() {
 
     const domParser = new DOMParser();
 
+    const runConcurrently = async (items, fn, limit) => {
+        const results = [];
+        const executing = new Set();
+
+        for (const item of items) {
+            const p = Promise.resolve().then(() => fn(item));
+            results.push(p);
+
+            const e = p.then(() => [], () => []);
+            executing.add(e);
+            const clean = () => executing.delete(e);
+            e.then(clean);
+
+            if (executing.size >= limit) {
+                await Promise.race(executing);
+            }
+        }
+
+        return Promise.allSettled(results);
+    };
+
     const flattenDetailsTags = (html) => {
         if (!html) return '';
         const doc = domParser.parseFromString(html, 'text/html');
@@ -209,7 +230,7 @@ globalThis.App.UI = (function() {
             });
 
             const cards = Array.from(existingCards.values());
-            await Promise.allSettled(cards.map(renderProject));
+            await runConcurrently(cards, renderProject, 5);
 
             cards.toSorted((a, b) => (Number(b.dataset.latest) || 0) - (Number(a.dataset.latest) || 0))
                 .forEach(c => container.appendChild(c));
