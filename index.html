@@ -30,6 +30,13 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%234f46e5%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.2%22%20stroke-width%3D%224%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2215%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.4%22%20stroke-width%3D%224%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2210%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.6%22%20stroke-width%3D%224%22/%3E%3Cpath%20stroke%3D%22%23fff%22%20stroke-linecap%3D%22round%22%20stroke-width%3D%224%22%20d%3D%22m32%2032%2014-14%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23fff%22/%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%234f46e5%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2220%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.2%22%20stroke-width%3D%224%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2215%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.4%22%20stroke-width%3D%224%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2210%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.6%22%20stroke-width%3D%224%22/%3E%3Cpath%20stroke%3D%22%23fff%22%20stroke-linecap%3D%22round%22%20stroke-width%3D%224%22%20d%3D%22m32%2032%2014-14%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23fff%22/%3E%3C/svg%3E">
     <link rel="canonical" href="https://comet-builds.github.io/ReleaseRadar/">
+    <style>
+        @media (max-width: 350px) {
+            .hide-on-tiny {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-600 dark:bg-slate-900 dark:text-slate-400 min-h-screen flex flex-col transition-colors duration-300">
 
@@ -39,9 +46,9 @@
             <header class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3">
                     <svg class="w-10 h-10 rounded-lg shadow-lg shadow-indigo-500/30" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 64 64"><rect width="64" height="64" fill="#4f46e5"/><circle cx="32" cy="32" r="20" stroke="#fff" stroke-opacity=".2" stroke-width="4"/><circle cx="32" cy="32" r="15" stroke="#fff" stroke-opacity=".4" stroke-width="4"/><circle cx="32" cy="32" r="10" stroke="#fff" stroke-opacity=".6" stroke-width="4"/><path stroke="#fff" stroke-linecap="round" stroke-width="4" d="m32 32 14-14"/><circle cx="32" cy="32" r="4" fill="#fff"/></svg>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white hidden sm:block">ReleaseRadar</h1>
-                        <p class="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider hidden sm:block -mt-1">For GitHub</p>
+                    <div class="hide-on-tiny">
+                        <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">ReleaseRadar</h1>
+                        <p class="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider -mt-1">For GitHub</p>
                     </div>
                 </div>
 
