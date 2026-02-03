@@ -19,7 +19,7 @@ ReleaseRadar is a browser‑only dashboard for tracking GitHub repository releas
 4. Set your refresh interval and theme.
 
 ## Preview
-<img alt="preview" src="https://github.com/user-attachments/assets/409dd8f0-8b37-471b-bba3-730806fc93ab"/>
+<img alt="preview" src="https://github.com/user-attachments/assets/82f204f2-35fd-4326-9b3b-5cf149d19e99"/>
 
 ## Release Handling
 ReleaseRadar distinguishes between **stable releases** and **pre-releases** using GitHub’s `prerelease` flag. A pre-release is shown only if it is newer than the latest stable release. Releases are sorted by publish date (`published_at`).
