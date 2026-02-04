@@ -227,7 +227,7 @@
     });
 
     setupEventListeners();
-    UI.refreshUI();
+    UI.refreshUI(true);
     setupAutoRefresh();
 
 })();
