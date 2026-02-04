@@ -104,7 +104,7 @@
             <div class="p-6 space-y-4">
                 <div>
                     <label for="new-repo-input" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Repository Identifier</label>
-                    <input type="text" id="new-repo-input" placeholder="e.g. microsoft/vscode" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                    <input type="text" id="new-repo-input" name="repository_search" autocomplete="off" data-lpignore="true" placeholder="e.g. microsoft/vscode" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
                     <p class="text-xs text-slate-500 mt-2">Enter the repository in <span class="font-mono bg-slate-100 dark:bg-slate-700 px-1 rounded">owner/repo</span> format, or paste the full GitHub URL</p>
                 </div>
                 <div class="flex justify-end pt-2">
@@ -137,7 +137,7 @@
                     <div class="space-y-3">
                         <label for="refresh-value-input" class="block text-sm text-slate-600 dark:text-slate-400">Auto-refresh Interval</label>
                         <div class="flex gap-3">
-                            <input type="number" id="refresh-value-input" min="1" step="1" class="w-1/2 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Value">
+                            <input type="number" id="refresh-value-input" name="refresh_interval" autocomplete="off" min="1" step="1" class="w-1/2 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Value">
                             
                             <div class="relative w-1/2">
                                 <select id="refresh-unit-select" class="w-full px-4 py-2 pr-10 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none appearance-none">
@@ -155,7 +155,7 @@
 
                     <div class="space-y-3 pt-2">
                         <label for="new-label-period-input" class="block text-sm text-slate-600 dark:text-slate-400">"New" Label Duration (Days)</label>
-                        <input type="number" id="new-label-period-input" min="1" step="1" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Days">
+                        <input type="number" id="new-label-period-input" name="new_label_period" autocomplete="off" min="1" step="1" class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Days">
                     </div>
                 </div>
 
@@ -163,7 +163,7 @@
                     <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">GitHub API</h4>
                     <div class="space-y-3">
                         <label for="api-key-input" class="block text-sm text-slate-600 dark:text-slate-400">Personal Access Token (Optional)</label>
-                        <input type="password" id="api-key-input" placeholder="ghp_..." class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <input type="password" id="api-key-input" name="github_pat" autocomplete="off" data-lpignore="true" placeholder="ghp_..." class="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                         <p class="text-xs text-slate-500">Required if you hit rate limits (60 vs 5000 requests/hour). Stored locally in your browser.</p>
                     </div>
                 </div>
@@ -186,7 +186,7 @@
                 </div>
                 
                 <div class="text-xs text-center text-slate-400 pt-4 flex items-center justify-center gap-2">
-                    <span>Version 2.1</span>
+                    <span>Version 2.2</span>
                     <span>•</span>
                     <a href="https://github.com/comet-builds?tab=repositories" target="_blank" class="hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors">comet</a>
                 </div>
