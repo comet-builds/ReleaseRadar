@@ -9,7 +9,7 @@ ReleaseRadar is a browser‑only dashboard for tracking GitHub repository releas
 - Customizable auto-refresh interval.
 - Support for GitHub personal access tokens (no scopes required).
 - Export/Import to allow transferring of repo list and settings to another device.
-- Installable as desktop web application.
+- Installable as a desktop web application.
 - Light and Dark theme.
 
 ## Quick Start
