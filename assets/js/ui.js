@@ -211,16 +211,20 @@ globalThis.App.UI = (function() {
 
             const activeKeys = new Set();
 
+            const newCardsFragment = document.createDocumentFragment();
+
             Store.state.projects.forEach(p => {
                 const key = `${p.owner}/${p.name}`;
                 activeKeys.add(key);
 
                 if (!existingCards.has(key)) {
                     const newCard = createProjectCard(p);
-                    container.appendChild(newCard);
+                    newCardsFragment.appendChild(newCard);
                     existingCards.set(key, newCard);
                 }
             });
+
+            container.appendChild(newCardsFragment);
 
             existingCards.forEach((card, key) => {
                 if (!activeKeys.has(key)) {
