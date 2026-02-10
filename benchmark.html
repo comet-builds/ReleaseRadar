@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Benchmark: Flatten Details Tags</title>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.3.1/dist/purify.min.js"></script>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 20px; }
+        .result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; }
+        .bar { height: 20px; background: #4f46e5; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <h1>Benchmark: Flatten Details Tags</h1>
+    <button id="run-btn">Run Benchmark</button>
+    <div id="output" class="result"></div>
+
+    <script>
+        // --- Setup ---
+        const iterations = 1000;
+        const detailsCount = 50;
+
+        // Generate test HTML with nested content
+        let testHtml = '';
+        for (let i = 0; i < detailsCount; i++) {
+            testHtml += `
+                <details>
+                    <summary>Details ${i}</summary>
+                    <p>This is some content inside details ${i}.</p>
+                    <ul>
+                        <li>Item 1</li>
+                        <li>Item 2</li>
+                    </ul>
+                </details>
+                <p>Some other content between details.</p>
+            `;
+        }
+
+        // Ensure DOMPurify is ready
+        const purify = DOMPurify;
+
+        // --- Baseline Implementation (Current Code) ---
+        const domParser = new DOMParser();
+        const flattenDetailsTags_Baseline = (html) => {
+            if (!html) return '';
+            const doc = domParser.parseFromString(html, 'text/html');
+            doc.querySelectorAll('details').forEach(el => {
+                const div = document.createElement('div');
+                div.className = 'border-l-2 border-slate-200 dark:border-slate-700 pl-4 my-3 space-y-2';
+                Array.from(el.childNodes).forEach(node => {
+                    if (node.nodeName.toLowerCase() !== 'summary') div.appendChild(node.cloneNode(true));
+                });
+                el.parentNode.replaceChild(div, el);
+            });
+            return doc.body.innerHTML;
+        };
+
+        // --- Optimized Implementation (DOM Fragment) ---
+        const flattenDetailsTags_Optimized = (html) => {
+            if (!html) return '';
+            const fragment = purify.sanitize(html, { RETURN_DOM_FRAGMENT: true });
+
+            fragment.querySelectorAll('details').forEach(el => {
+                const div = document.createElement('div');
+                div.className = 'border-l-2 border-slate-200 dark:border-slate-700 pl-4 my-3 space-y-2';
+                while (el.firstChild) {
+                    const node = el.firstChild;
+                    if (node.nodeName.toLowerCase() !== 'summary') {
+                        div.appendChild(node);
+                    } else {
+                        el.removeChild(node);
+                    }
+                }
+                el.parentNode.replaceChild(div, el);
+            });
+
+            const temp = document.createElement('div');
+            temp.appendChild(fragment);
+            return temp.innerHTML;
+        };
+
+        const runBenchmark = () => {
+            const output = document.getElementById('output');
+            output.innerHTML = 'Running...';
+
+            setTimeout(() => {
+                // 1. Measure Baseline
+                // Baseline: sanitize() -> flattenDetailsTags(string->DOM->string)
+                const rawHtml = testHtml;
+
+                const startBaseline = performance.now();
+                for (let i = 0; i < iterations; i++) {
+                    const sanitized = purify.sanitize(rawHtml);
+                    const result = flattenDetailsTags_Baseline(sanitized);
+                }
+                const endBaseline = performance.now();
+                const durationBaseline = endBaseline - startBaseline;
+
+                // 2. Measure Optimized
+                // Optimized: flattenDetailsTags(string -> sanitize(FRAGMENT) -> transform -> string)
+
+                const startOptimized = performance.now();
+                for (let i = 0; i < iterations; i++) {
+                    const result = flattenDetailsTags_Optimized(rawHtml);
+                }
+                const endOptimized = performance.now();
+                const durationOptimized = endOptimized - startOptimized;
+
+                // Verify correctness of optimized output (basic check)
+                const checkResult = flattenDetailsTags_Optimized(rawHtml);
+                const hasDetails = checkResult.includes('<details>');
+                const hasDiv = checkResult.includes('border-l-2');
+
+                // Output results
+                const improvement = ((durationBaseline - durationOptimized) / durationBaseline * 100).toFixed(2);
+
+                output.innerHTML = `
+                    <h3>Results (${iterations} iterations, ${detailsCount} details tags each)</h3>
+                    <p><strong>Baseline:</strong> ${durationBaseline.toFixed(2)} ms</p>
+                    <p><strong>Optimized:</strong> ${durationOptimized.toFixed(2)} ms</p>
+                    <p><strong>Improvement:</strong> <span style="color: green; font-weight: bold;">${improvement}%</span></p>
+                    <p><strong>Correctness Check:</strong> Details removed? ${!hasDetails}, styled Div present? ${hasDiv}</p>
+                `;
+            }, 100);
+        };
+
+        document.getElementById('run-btn').addEventListener('click', runBenchmark);
+
+        // Auto-run for convenience
+        // runBenchmark();
+    </script>
+</body>
+</html>
