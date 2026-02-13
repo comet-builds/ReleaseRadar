@@ -1,4 +1,3 @@
-// Main Entry Point
 (function() {
     const Store = globalThis.App.Store;
     const UI = globalThis.App.UI;
@@ -82,7 +81,6 @@
         let lVal = Number.parseInt(newLabelInput.value);
         if (Number.isNaN(lVal) || lVal < 0) lVal = 7;
 
-        // Get theme
         const activeBtn = document.querySelector('[data-theme-value].bg-white'); // Active button has white bg
         const newTheme = activeBtn ? activeBtn.dataset.themeValue : 'device';
 
@@ -174,7 +172,6 @@
 
         document.getElementById('add-repo-confirm-btn')?.addEventListener('click', handleAddRepo);
 
-        // Theme segmented control listeners
         document.querySelectorAll('[data-theme-value]').forEach(btn => {
             btn.addEventListener('click', () => {
                 UI.applyTheme(btn.dataset.themeValue);
@@ -183,8 +180,6 @@
 
         // Listen for system theme changes if in device mode
         globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-             // We can check if currently selected mode is 'device', or just let applyTheme handle it
-             // If we are in device mode, we should update
              const activeBtn = document.querySelector('[data-theme-value].bg-white');
              if (activeBtn?.dataset.themeValue === 'device' || (!activeBtn && Store.state.theme === 'device')) {
                  UI.applyTheme('device');
@@ -205,7 +200,6 @@
         });
     };
 
-    // Init
     const toastContainer = document.getElementById('toast-container');
     if (toastContainer) {
         try {

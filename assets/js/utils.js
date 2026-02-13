@@ -1,4 +1,3 @@
-// Namespace init
 globalThis.App = globalThis.App || {};
 
 globalThis.App.Utils = (function() {

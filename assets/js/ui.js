@@ -264,7 +264,6 @@ globalThis.App.UI = (function() {
     const updateThemeControl = (activeTheme) => {
         document.querySelectorAll('[data-theme-value]').forEach(btn => {
             const isActive = btn.dataset.themeValue === activeTheme;
-            // Base classes: flex-1 py-1 px-3 rounded-md text-sm font-medium transition-all
             if (isActive) {
                 btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-slate-700', 'dark:text-white');
                 btn.classList.remove('text-slate-500', 'hover:text-slate-900', 'dark:text-slate-400', 'dark:hover:text-white');
@@ -324,7 +323,6 @@ globalThis.App.UI = (function() {
         const stateLabelPeriod = Store.state.newLabelPeriod === undefined ? 7 : Store.state.newLabelPeriod;
         if (lVal !== stateLabelPeriod) return true;
 
-        // Check theme
         const activeBtn = document.querySelector('[data-theme-value].bg-white');
         const currentTheme = activeBtn ? activeBtn.dataset.themeValue : 'device';
 
@@ -345,7 +343,6 @@ globalThis.App.UI = (function() {
             modal.classList.remove('active');
             setTimeout(() => modal.close(), 200);
 
-            // Revert settings
             if (id === 'settings-modal') {
                 applyTheme(Store.state.theme);
             }
