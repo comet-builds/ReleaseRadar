@@ -40,7 +40,7 @@ globalThis.App.UI = (function() {
             while (el.firstChild) {
                 const node = el.firstChild;
                 if (node.nodeName.toLowerCase() === 'summary') {
-                    el.removeChild(node);
+                    node.remove();
                 } else {
                     div.appendChild(node);
                 }
