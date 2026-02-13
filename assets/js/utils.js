@@ -1,4 +1,3 @@
-// Namespace init
 globalThis.App = globalThis.App || {};
 
 globalThis.App.Utils = (function() {
@@ -17,10 +16,16 @@ globalThis.App.Utils = (function() {
 
     const escapeAttr = (str) => str.replaceAll('"', '&quot;');
 
+    // Shared formatters for performance
+    const dateFormatter = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeFormatter = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
+
     const formatDate = (str) => {
         const date = new Date(str);
-        return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) +
-            ' • ' + date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        if (Number.isNaN(date.getTime())) {
+            return 'Invalid Date • Invalid Date';
+        }
+        return dateFormatter.format(date) + ' • ' + timeFormatter.format(date);
     };
 
     const showToast = (message, type = 'success') => {

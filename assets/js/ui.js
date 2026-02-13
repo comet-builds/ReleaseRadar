@@ -5,8 +5,6 @@ globalThis.App.UI = (function() {
     const Utils = globalThis.App.Utils;
     const Github = globalThis.App.Github;
 
-    const domParser = new DOMParser();
-
     const runConcurrently = async (items, fn, limit) => {
         const results = [];
         const executing = new Set();
@@ -30,16 +28,29 @@ globalThis.App.UI = (function() {
 
     const flattenDetailsTags = (html) => {
         if (!html) return '';
-        const doc = domParser.parseFromString(html, 'text/html');
-        doc.querySelectorAll('details').forEach(el => {
+        // Use DOMPurify to sanitize and parse into a DocumentFragment in one pass
+        // This avoids using DOMParser which is slower and parses the whole string again
+        const fragment = globalThis.DOMPurify.sanitize(html, { RETURN_DOM_FRAGMENT: true });
+
+        fragment.querySelectorAll('details').forEach(el => {
             const div = document.createElement('div');
             div.className = 'border-l-2 border-slate-200 dark:border-slate-700 pl-4 my-3 space-y-2';
-            Array.from(el.childNodes).forEach(node => {
-                if (node.nodeName.toLowerCase() !== 'summary') div.appendChild(node.cloneNode(true));
-            });
+
+            // Move children to new div, excluding summary
+            while (el.firstChild) {
+                const node = el.firstChild;
+                if (node.nodeName.toLowerCase() === 'summary') {
+                    el.removeChild(node);
+                } else {
+                    div.appendChild(node);
+                }
+            }
             el.parentNode.replaceChild(div, el);
         });
-        return doc.body.innerHTML;
+
+        const temp = document.createElement('div');
+        temp.appendChild(fragment);
+        return temp.innerHTML;
     };
 
     const createAssetList = (assets) => {
@@ -98,7 +109,7 @@ globalThis.App.UI = (function() {
 
                         <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mt-6 mb-3">Release Notes</h4>
                         <div class="prose prose-sm prose-slate dark:prose-invert max-w-none break-words bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-                            ${flattenDetailsTags(release.body ? globalThis.DOMPurify.sanitize(globalThis.marked.parse(release.body)) : '<p class="text-slate-400 italic">No release notes.</p>')}
+                            ${release.body ? flattenDetailsTags(globalThis.marked.parse(release.body)) : '<p class="text-slate-400 italic">No release notes.</p>'}
                         </div>
                     </div>
                 </div>
@@ -211,16 +222,20 @@ globalThis.App.UI = (function() {
 
             const activeKeys = new Set();
 
+            const newCardsFragment = document.createDocumentFragment();
+
             Store.state.projects.forEach(p => {
                 const key = `${p.owner}/${p.name}`;
                 activeKeys.add(key);
 
                 if (!existingCards.has(key)) {
                     const newCard = createProjectCard(p);
-                    container.appendChild(newCard);
+                    newCardsFragment.appendChild(newCard);
                     existingCards.set(key, newCard);
                 }
             });
+
+            container.appendChild(newCardsFragment);
 
             existingCards.forEach((card, key) => {
                 if (!activeKeys.has(key)) {
@@ -249,7 +264,6 @@ globalThis.App.UI = (function() {
     const updateThemeControl = (activeTheme) => {
         document.querySelectorAll('[data-theme-value]').forEach(btn => {
             const isActive = btn.dataset.themeValue === activeTheme;
-            // Base classes: flex-1 py-1 px-3 rounded-md text-sm font-medium transition-all
             if (isActive) {
                 btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-slate-700', 'dark:text-white');
                 btn.classList.remove('text-slate-500', 'hover:text-slate-900', 'dark:text-slate-400', 'dark:hover:text-white');
@@ -309,7 +323,6 @@ globalThis.App.UI = (function() {
         const stateLabelPeriod = Store.state.newLabelPeriod === undefined ? 7 : Store.state.newLabelPeriod;
         if (lVal !== stateLabelPeriod) return true;
 
-        // Check theme
         const activeBtn = document.querySelector('[data-theme-value].bg-white');
         const currentTheme = activeBtn ? activeBtn.dataset.themeValue : 'device';
 
@@ -330,7 +343,6 @@ globalThis.App.UI = (function() {
             modal.classList.remove('active');
             setTimeout(() => modal.close(), 200);
 
-            // Revert settings
             if (id === 'settings-modal') {
                 applyTheme(Store.state.theme);
             }
