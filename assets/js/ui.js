@@ -27,9 +27,8 @@ globalThis.App.UI = (function() {
     };
 
     const flattenDetailsTags = (html) => {
-        if (!html) return '';
-        // Use DOMPurify to sanitize and parse into a DocumentFragment in one pass
-        // This avoids using DOMParser which is slower and parses the whole string again
+        if (!html) return document.createDocumentFragment();
+        // Sanitize and parse directly to DocumentFragment (avoids DOMParser overhead)
         const fragment = globalThis.DOMPurify.sanitize(html, { RETURN_DOM_FRAGMENT: true });
 
         fragment.querySelectorAll('details').forEach(el => {
@@ -48,72 +47,157 @@ globalThis.App.UI = (function() {
             el.parentNode.replaceChild(div, el);
         });
 
-        const temp = document.createElement('div');
-        temp.appendChild(fragment);
-        return temp.innerHTML;
+        return fragment;
     };
 
     const createAssetList = (assets) => {
-        if (!assets?.length) return '<p class="text-sm text-slate-400 italic py-1">No attached assets.</p>';
-        return `<ul class="space-y-2 mt-3">
-            ${assets.map(a => `
-            <li>
-                <a href="${a.browser_download_url}" class="group flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-all text-sm">
-                    <div class="flex items-center overflow-hidden">
-                        <div class="mr-3 flex-shrink-0">${Utils.ICONS.DOWNLOAD}</div>
-                        <span class="truncate font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors">${globalThis.DOMPurify.sanitize(a.name)}</span>
-                    </div>
-                    <span class="ml-3 text-xs font-mono text-slate-400 whitespace-nowrap bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-700 shadow-sm">${(a.size / 1048576).toFixed(2)} MB</span>
-                </a>
-            </li>`).join('')}
-        </ul>`;
+        if (!assets?.length) {
+            const p = document.createElement('p');
+            p.className = 'text-sm text-slate-400 italic py-1';
+            p.textContent = 'No attached assets.';
+            return p;
+        }
+
+        const ul = document.createElement('ul');
+        ul.className = 'space-y-2 mt-3';
+
+        assets.forEach(a => {
+            const li = document.createElement('li');
+
+            const link = document.createElement('a');
+            link.href = a.browser_download_url;
+            link.className = 'group flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-all text-sm';
+
+            const div = document.createElement('div');
+            div.className = 'flex items-center overflow-hidden';
+
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'mr-3 flex-shrink-0';
+            iconDiv.innerHTML = Utils.ICONS.DOWNLOAD;
+            div.appendChild(iconDiv);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'truncate font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors';
+            nameSpan.appendChild(globalThis.DOMPurify.sanitize(a.name, {RETURN_DOM_FRAGMENT: true}));
+            div.appendChild(nameSpan);
+
+            link.appendChild(div);
+
+            const sizeSpan = document.createElement('span');
+            sizeSpan.className = 'ml-3 text-xs font-mono text-slate-400 whitespace-nowrap bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-100 dark:border-slate-700 shadow-sm';
+            sizeSpan.textContent = `${(a.size / 1048576).toFixed(2)} MB`;
+            link.appendChild(sizeSpan);
+
+            li.appendChild(link);
+            ul.appendChild(li);
+        });
+
+        return ul;
     };
 
     const createReleaseCard = (release, label, isPre) => {
         const freshMs = (Store.state.newLabelPeriod || 7) * 24 * 3600 * 1000;
         const isFresh = (Date.now() - new Date(release.published_at).getTime()) <= freshMs;
-
-        const badgeBase = "inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide shadow-sm";
-        const stableBadge = "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-500/30";
-        const preBadge = "bg-amber-50 text-amber-700 ring-1 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-500/30";
-        const freshBadgeStyle = isPre ? preBadge : stableBadge;
-
-        const freshBadge = isFresh ? `<span class="${badgeBase} ${freshBadgeStyle}">New</span>` : '';
         const labelColor = isPre ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400';
 
-        return `
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col transition-all hover:shadow-md h-full">
-                <div class="p-5 flex-grow">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="min-w-0 flex-1 mr-2">
-                            <span class="text-xs font-bold uppercase tracking-widest ${labelColor} mb-1 block">${label}</span>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <a href="${release.html_url}" target="_blank" class="group flex items-center text-lg font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors break-all">
-                                    ${globalThis.DOMPurify.sanitize(release.tag_name)}
-                                </a>
-                                ${freshBadge}
-                            </div>
-                        </div>
-                        <span class="text-xs font-medium text-slate-400 whitespace-nowrap bg-slate-50 dark:bg-slate-900 px-2 py-1 rounded-md border border-slate-100 dark:border-slate-700">${Utils.formatDate(release.published_at)}</span>
-                    </div>
+        const card = document.createElement('div');
+        card.className = 'bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col transition-all hover:shadow-md h-full';
 
-                    <button data-action="toggle-details" data-target="d-${release.id}" class="w-full flex items-center justify-center gap-2 py-2 px-4 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <span>View Assets & Notes</span> ${Utils.ICONS.CHEVRON}
-                    </button>
-                </div>
+        const topSection = document.createElement('div');
+        topSection.className = 'p-5 flex-grow';
 
-                <div id="d-${release.id}" class="release-details border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-xl">
-                    <div class="p-5">
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Assets</h4>
-                        ${createAssetList(release.assets)}
+        const headerRow = document.createElement('div');
+        headerRow.className = 'flex justify-between items-start mb-4';
 
-                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mt-6 mb-3">Release Notes</h4>
-                        <div class="prose prose-sm prose-slate dark:prose-invert max-w-none break-words bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-                            ${release.body ? flattenDetailsTags(globalThis.marked.parse(release.body)) : '<p class="text-slate-400 italic">No release notes.</p>'}
-                        </div>
-                    </div>
-                </div>
-            </div>`;
+        const leftCol = document.createElement('div');
+        leftCol.className = 'min-w-0 flex-1 mr-2';
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = `text-xs font-bold uppercase tracking-widest ${labelColor} mb-1 block`;
+        labelSpan.textContent = label;
+        leftCol.appendChild(labelSpan);
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'flex items-center gap-2 flex-wrap';
+
+        const titleLink = document.createElement('a');
+        titleLink.href = release.html_url;
+        titleLink.target = '_blank';
+        titleLink.className = 'group flex items-center text-lg font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors break-all';
+        titleLink.appendChild(globalThis.DOMPurify.sanitize(release.tag_name, {RETURN_DOM_FRAGMENT: true}));
+        titleRow.appendChild(titleLink);
+
+        if (isFresh) {
+            const badgeBase = 'inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide shadow-sm';
+            const stableBadge = 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-500/30';
+            const preBadge = 'bg-amber-50 text-amber-700 ring-1 ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-500/30';
+            const freshBadgeStyle = isPre ? preBadge : stableBadge;
+
+            const badge = document.createElement('span');
+            badge.className = `${badgeBase} ${freshBadgeStyle}`;
+            badge.textContent = 'New';
+            titleRow.appendChild(badge);
+        }
+
+        leftCol.appendChild(titleRow);
+        headerRow.appendChild(leftCol);
+
+        const dateSpan = document.createElement('span');
+        dateSpan.className = 'text-xs font-medium text-slate-400 whitespace-nowrap bg-slate-50 dark:bg-slate-900 px-2 py-1 rounded-md border border-slate-100 dark:border-slate-700';
+        dateSpan.textContent = Utils.formatDate(release.published_at);
+        headerRow.appendChild(dateSpan);
+
+        topSection.appendChild(headerRow);
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.dataset.action = 'toggle-details';
+        toggleBtn.dataset.target = `d-${release.id}`;
+        toggleBtn.className = 'w-full flex items-center justify-center gap-2 py-2 px-4 bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-200 dark:border-slate-700 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500';
+
+        const btnText = document.createElement('span');
+        btnText.textContent = 'View Assets & Notes';
+        toggleBtn.appendChild(btnText);
+        toggleBtn.insertAdjacentHTML('beforeend', Utils.ICONS.CHEVRON);
+
+        topSection.appendChild(toggleBtn);
+        card.appendChild(topSection);
+
+        const detailsSection = document.createElement('div');
+        detailsSection.id = `d-${release.id}`;
+        detailsSection.className = 'release-details border-t border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-xl';
+
+        const detailsContent = document.createElement('div');
+        detailsContent.className = 'p-5';
+
+        const assetsHeader = document.createElement('h4');
+        assetsHeader.className = 'text-xs font-bold uppercase tracking-wider text-slate-400 mb-3';
+        assetsHeader.textContent = 'Assets';
+        detailsContent.appendChild(assetsHeader);
+
+        detailsContent.appendChild(createAssetList(release.assets));
+
+        const notesHeader = document.createElement('h4');
+        notesHeader.className = 'text-xs font-bold uppercase tracking-wider text-slate-400 mt-6 mb-3';
+        notesHeader.textContent = 'Release Notes';
+        detailsContent.appendChild(notesHeader);
+
+        const notesContainer = document.createElement('div');
+        notesContainer.className = 'prose prose-sm prose-slate dark:prose-invert max-w-none break-words bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm';
+
+        if (release.body) {
+            notesContainer.appendChild(flattenDetailsTags(globalThis.marked.parse(release.body)));
+        } else {
+            const noNotes = document.createElement('p');
+            noNotes.className = 'text-slate-400 italic';
+            noNotes.textContent = 'No release notes.';
+            notesContainer.appendChild(noNotes);
+        }
+
+        detailsContent.appendChild(notesContainer);
+        detailsSection.appendChild(detailsContent);
+        card.appendChild(detailsSection);
+
+        return card;
     };
 
     const handleRemoveRepo = (owner, name) => {
@@ -176,13 +260,22 @@ globalThis.App.UI = (function() {
                 return;
             }
 
-            let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">';
-            html += stable ? createReleaseCard(stable, 'Latest Stable', false) : '<div class="hidden md:block"></div>';
+            content.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 items-start';
+
+            if (stable) {
+                grid.appendChild(createReleaseCard(stable, 'Latest Stable', false));
+            } else {
+                const spacer = document.createElement('div');
+                spacer.className = 'hidden md:block';
+                grid.appendChild(spacer);
+            }
 
             if (pre && (!stable || pre.published_at > stable.published_at)) {
-                html += createReleaseCard(pre, 'Pre-release', true);
+                grid.appendChild(createReleaseCard(pre, 'Pre-release', true));
             }
-            content.innerHTML = html + '</div>';
+            content.appendChild(grid);
 
         } catch (err) {
             content.innerHTML = `
@@ -193,16 +286,18 @@ globalThis.App.UI = (function() {
         }
     };
 
-    const refreshUI = async (forceRefresh = false) => {
-        const container = document.getElementById('projects-container');
-        const emptyState = document.getElementById('empty-state');
-        const headerAddBtn = document.getElementById('header-add-repo-btn');
-        const refreshBtn = document.getElementById('refresh-btn');
+    const updateRefreshIcon = (btn, forceRefresh) => {
+        if (!btn) return;
+        btn.innerHTML = Utils.ICONS.REFRESH;
+        if (forceRefresh) {
+            const svg = btn.querySelector('svg');
+            if (svg) svg.classList.add('animate-spin');
+        }
+    };
 
-        if (refreshBtn) refreshBtn.innerHTML = Utils.ICONS.REFRESH;
-        if (refreshBtn && forceRefresh) refreshBtn.querySelector('svg').classList.add('animate-spin');
-
-        if (Store.state.projects.length === 0) {
+    const updateEmptyState = (container, emptyState, headerAddBtn) => {
+        const isEmpty = Store.state.projects.length === 0;
+        if (isEmpty) {
             container.innerHTML = '';
             emptyState.classList.remove('hidden');
             container.classList.add('hidden');
@@ -211,40 +306,74 @@ globalThis.App.UI = (function() {
             emptyState.classList.add('hidden');
             container.classList.remove('hidden');
             if (headerAddBtn) headerAddBtn.classList.remove('hidden');
+        }
+        return isEmpty;
+    };
 
-            // Reconciliation
-            const existingCards = new Map();
-            Array.from(container.children).forEach(card => {
-                if (card.dataset.owner && card.dataset.name) {
-                    existingCards.set(`${card.dataset.owner}/${card.dataset.name}`, card);
-                }
-            });
+    const reconcileCards = (container) => {
+        const existingCards = new Map();
+        Array.from(container.children).forEach(card => {
+            if (card.dataset.owner && card.dataset.name) {
+                existingCards.set(`${card.dataset.owner}/${card.dataset.name}`, card);
+            }
+        });
 
-            const activeKeys = new Set();
+        const activeKeys = new Set();
+        const newCardsFragment = document.createDocumentFragment();
 
-            const newCardsFragment = document.createDocumentFragment();
+        Store.state.projects.forEach(p => {
+            const key = `${p.owner}/${p.name}`;
+            activeKeys.add(key);
 
-            Store.state.projects.forEach(p => {
-                const key = `${p.owner}/${p.name}`;
-                activeKeys.add(key);
+            if (!existingCards.has(key)) {
+                const newCard = createProjectCard(p);
+                newCardsFragment.appendChild(newCard);
+                existingCards.set(key, newCard);
+            }
+        });
 
-                if (!existingCards.has(key)) {
-                    const newCard = createProjectCard(p);
-                    newCardsFragment.appendChild(newCard);
-                    existingCards.set(key, newCard);
-                }
-            });
+        container.appendChild(newCardsFragment);
 
-            container.appendChild(newCardsFragment);
+        existingCards.forEach((card, key) => {
+            if (!activeKeys.has(key)) {
+                card.remove();
+                existingCards.delete(key);
+            }
+        });
 
-            existingCards.forEach((card, key) => {
-                if (!activeKeys.has(key)) {
-                    card.remove();
-                    existingCards.delete(key);
-                }
-            });
+        return Array.from(existingCards.values());
+    };
 
-            const cards = Array.from(existingCards.values());
+    const sortAndReorderCards = (container, cards) => {
+        const cardsWithLatest = cards.map(card => ({
+            card,
+            latest: Number(card.dataset.latest) || 0
+        }));
+
+        cardsWithLatest.sort((a, b) => b.latest - a.latest);
+        const sortedCards = cardsWithLatest.map(item => item.card);
+
+        const currentChildren = container.children;
+        const needsReorder = sortedCards.length !== currentChildren.length ||
+                             sortedCards.some((card, i) => card !== currentChildren[i]);
+
+        if (needsReorder) {
+            const fragment = document.createDocumentFragment();
+            sortedCards.forEach(c => fragment.appendChild(c));
+            container.appendChild(fragment);
+        }
+    };
+
+    const refreshUI = async (forceRefresh = false) => {
+        const container = document.getElementById('projects-container');
+        const emptyState = document.getElementById('empty-state');
+        const headerAddBtn = document.getElementById('header-add-repo-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+
+        updateRefreshIcon(refreshBtn, forceRefresh);
+
+        if (!updateEmptyState(container, emptyState, headerAddBtn)) {
+            const cards = reconcileCards(container);
 
             await runConcurrently(
                 cards,
@@ -252,17 +381,23 @@ globalThis.App.UI = (function() {
                 5
             );
 
-            const fragment = document.createDocumentFragment();
-            cards.toSorted((a, b) => (Number(b.dataset.latest) || 0) - (Number(a.dataset.latest) || 0))
-                .forEach(c => fragment.appendChild(c));
-            container.appendChild(fragment);
+            sortAndReorderCards(container, cards);
         }
 
-        if (refreshBtn && forceRefresh) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
+        if (refreshBtn && forceRefresh) {
+            setTimeout(() => {
+                const svg = refreshBtn.querySelector('svg');
+                if (svg) svg.classList.remove('animate-spin');
+            }, 500);
+        }
     };
 
+    let themeControlBtns = null;
     const updateThemeControl = (activeTheme) => {
-        document.querySelectorAll('[data-theme-value]').forEach(btn => {
+        if (!themeControlBtns) {
+            themeControlBtns = document.querySelectorAll('[data-theme-value]');
+        }
+        themeControlBtns.forEach(btn => {
             const isActive = btn.dataset.themeValue === activeTheme;
             if (isActive) {
                 btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-slate-700', 'dark:text-white');
@@ -300,7 +435,7 @@ globalThis.App.UI = (function() {
         document.getElementById('refresh-unit-select').value = Store.state.refreshUnit;
         document.getElementById('new-label-period-input').value = Store.state.newLabelPeriod || 7;
 
-        // Ensure UI reflects current state (store state, not necessarily current DOM state if cancelled)
+        // Reset theme controls to stored state
         updateThemeControl(Store.state.theme);
     };
 
