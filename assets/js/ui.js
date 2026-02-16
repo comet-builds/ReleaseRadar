@@ -255,6 +255,36 @@ globalThis.App.UI = (function() {
 
             if (data.length) card.dataset.latest = new Date(data[0].published_at).getTime();
 
+            // Calculate render signature to avoid redundant DOM updates
+            const freshMs = (Store.state.newLabelPeriod || 7) * 24 * 3600 * 1000;
+            const now = Date.now();
+
+            const getFreshness = (release) => {
+                if (!release) return false;
+                return (now - new Date(release.published_at).getTime()) <= freshMs;
+            };
+
+            const newSignature = {
+                stableId: stable?.id,
+                preId: pre?.id,
+                stableFresh: getFreshness(stable),
+                preFresh: getFreshness(pre),
+                error: null
+            };
+
+            const prevSignature = card._renderCache;
+
+            if (prevSignature &&
+                prevSignature.stableId === newSignature.stableId &&
+                prevSignature.preId === newSignature.preId &&
+                prevSignature.stableFresh === newSignature.stableFresh &&
+                prevSignature.preFresh === newSignature.preFresh &&
+                prevSignature.error === null) {
+                return;
+            }
+
+            card._renderCache = newSignature;
+
             if (!stable && !pre) {
                 content.innerHTML = `<div class="text-center text-slate-400 py-8 bg-slate-50 dark:bg-slate-900 rounded-lg border border-dashed border-slate-200 dark:border-slate-700">No suitable releases found.</div>`;
                 return;
@@ -278,6 +308,15 @@ globalThis.App.UI = (function() {
             content.appendChild(grid);
 
         } catch (err) {
+            const errorSignature = { error: err.message };
+            const prevSignature = card._renderCache;
+
+            if (prevSignature && prevSignature.error === errorSignature.error) {
+                return;
+            }
+
+            card._renderCache = errorSignature;
+
             content.innerHTML = `
                 <div class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm border border-red-100 dark:border-red-900/30 flex items-center gap-3">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
