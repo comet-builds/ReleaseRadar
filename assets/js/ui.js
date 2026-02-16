@@ -286,8 +286,12 @@ globalThis.App.UI = (function() {
         if (refreshBtn && forceRefresh) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
     };
 
+    let themeControlBtns = null;
     const updateThemeControl = (activeTheme) => {
-        document.querySelectorAll('[data-theme-value]').forEach(btn => {
+        if (!themeControlBtns) {
+            themeControlBtns = document.querySelectorAll('[data-theme-value]');
+        }
+        themeControlBtns.forEach(btn => {
             const isActive = btn.dataset.themeValue === activeTheme;
             if (isActive) {
                 btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-slate-700', 'dark:text-white');
