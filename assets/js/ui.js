@@ -252,10 +252,35 @@ globalThis.App.UI = (function() {
                 5
             );
 
-            const fragment = document.createDocumentFragment();
-            cards.toSorted((a, b) => (Number(b.dataset.latest) || 0) - (Number(a.dataset.latest) || 0))
-                .forEach(c => fragment.appendChild(c));
-            container.appendChild(fragment);
+            // Pre-calculate latest values to avoid repeated DOM and string-to-number operations during sorting
+            const cardsWithLatest = cards.map(card => ({
+                card,
+                latest: Number(card.dataset.latest) || 0
+            }));
+
+            cardsWithLatest.sort((a, b) => b.latest - a.latest);
+            const sortedCards = cardsWithLatest.map(item => item.card);
+
+            // Check if the DOM order already matches the sorted order to prevent expensive layout calculations
+            const currentChildren = container.children;
+            let needsReorder = false;
+
+            if (sortedCards.length !== currentChildren.length) {
+                needsReorder = true;
+            } else {
+                for (let i = 0; i < sortedCards.length; i++) {
+                    if (sortedCards[i] !== currentChildren[i]) {
+                        needsReorder = true;
+                        break;
+                    }
+                }
+            }
+
+            if (needsReorder) {
+                const fragment = document.createDocumentFragment();
+                sortedCards.forEach(c => fragment.appendChild(c));
+                container.appendChild(fragment);
+            }
         }
 
         if (refreshBtn && forceRefresh) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
