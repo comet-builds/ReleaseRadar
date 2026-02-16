@@ -286,16 +286,18 @@ globalThis.App.UI = (function() {
         }
     };
 
-    const refreshUI = async (forceRefresh = false) => {
-        const container = document.getElementById('projects-container');
-        const emptyState = document.getElementById('empty-state');
-        const headerAddBtn = document.getElementById('header-add-repo-btn');
-        const refreshBtn = document.getElementById('refresh-btn');
+    const updateRefreshIcon = (btn, forceRefresh) => {
+        if (!btn) return;
+        btn.innerHTML = Utils.ICONS.REFRESH;
+        if (forceRefresh) {
+            const svg = btn.querySelector('svg');
+            if (svg) svg.classList.add('animate-spin');
+        }
+    };
 
-        if (refreshBtn) refreshBtn.innerHTML = Utils.ICONS.REFRESH;
-        if (refreshBtn && forceRefresh) refreshBtn.querySelector('svg').classList.add('animate-spin');
-
-        if (Store.state.projects.length === 0) {
+    const updateEmptyState = (container, emptyState, headerAddBtn) => {
+        const isEmpty = Store.state.projects.length === 0;
+        if (isEmpty) {
             container.innerHTML = '';
             emptyState.classList.remove('hidden');
             container.classList.add('hidden');
@@ -304,40 +306,74 @@ globalThis.App.UI = (function() {
             emptyState.classList.add('hidden');
             container.classList.remove('hidden');
             if (headerAddBtn) headerAddBtn.classList.remove('hidden');
+        }
+        return isEmpty;
+    };
 
-            // Reconciliation
-            const existingCards = new Map();
-            Array.from(container.children).forEach(card => {
-                if (card.dataset.owner && card.dataset.name) {
-                    existingCards.set(`${card.dataset.owner}/${card.dataset.name}`, card);
-                }
-            });
+    const reconcileCards = (container) => {
+        const existingCards = new Map();
+        Array.from(container.children).forEach(card => {
+            if (card.dataset.owner && card.dataset.name) {
+                existingCards.set(`${card.dataset.owner}/${card.dataset.name}`, card);
+            }
+        });
 
-            const activeKeys = new Set();
+        const activeKeys = new Set();
+        const newCardsFragment = document.createDocumentFragment();
 
-            const newCardsFragment = document.createDocumentFragment();
+        Store.state.projects.forEach(p => {
+            const key = `${p.owner}/${p.name}`;
+            activeKeys.add(key);
 
-            Store.state.projects.forEach(p => {
-                const key = `${p.owner}/${p.name}`;
-                activeKeys.add(key);
+            if (!existingCards.has(key)) {
+                const newCard = createProjectCard(p);
+                newCardsFragment.appendChild(newCard);
+                existingCards.set(key, newCard);
+            }
+        });
 
-                if (!existingCards.has(key)) {
-                    const newCard = createProjectCard(p);
-                    newCardsFragment.appendChild(newCard);
-                    existingCards.set(key, newCard);
-                }
-            });
+        container.appendChild(newCardsFragment);
 
-            container.appendChild(newCardsFragment);
+        existingCards.forEach((card, key) => {
+            if (!activeKeys.has(key)) {
+                card.remove();
+                existingCards.delete(key);
+            }
+        });
 
-            existingCards.forEach((card, key) => {
-                if (!activeKeys.has(key)) {
-                    card.remove();
-                    existingCards.delete(key);
-                }
-            });
+        return Array.from(existingCards.values());
+    };
 
-            const cards = Array.from(existingCards.values());
+    const sortAndReorderCards = (container, cards) => {
+        const cardsWithLatest = cards.map(card => ({
+            card,
+            latest: Number(card.dataset.latest) || 0
+        }));
+
+        cardsWithLatest.sort((a, b) => b.latest - a.latest);
+        const sortedCards = cardsWithLatest.map(item => item.card);
+
+        const currentChildren = container.children;
+        const needsReorder = sortedCards.length !== currentChildren.length ||
+                             sortedCards.some((card, i) => card !== currentChildren[i]);
+
+        if (needsReorder) {
+            const fragment = document.createDocumentFragment();
+            sortedCards.forEach(c => fragment.appendChild(c));
+            container.appendChild(fragment);
+        }
+    };
+
+    const refreshUI = async (forceRefresh = false) => {
+        const container = document.getElementById('projects-container');
+        const emptyState = document.getElementById('empty-state');
+        const headerAddBtn = document.getElementById('header-add-repo-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+
+        updateRefreshIcon(refreshBtn, forceRefresh);
+
+        if (!updateEmptyState(container, emptyState, headerAddBtn)) {
+            const cards = reconcileCards(container);
 
             await runConcurrently(
                 cards,
@@ -345,38 +381,15 @@ globalThis.App.UI = (function() {
                 5
             );
 
-            // Pre-calculate values for efficient sorting
-            const cardsWithLatest = cards.map(card => ({
-                card,
-                latest: Number(card.dataset.latest) || 0
-            }));
-
-            cardsWithLatest.sort((a, b) => b.latest - a.latest);
-            const sortedCards = cardsWithLatest.map(item => item.card);
-
-            // Optimization: Skip reorder if already sorted
-            const currentChildren = container.children;
-            let needsReorder = false;
-
-            if (sortedCards.length !== currentChildren.length) {
-                needsReorder = true;
-            } else {
-                for (let i = 0; i < sortedCards.length; i++) {
-                    if (sortedCards[i] !== currentChildren[i]) {
-                        needsReorder = true;
-                        break;
-                    }
-                }
-            }
-
-            if (needsReorder) {
-                const fragment = document.createDocumentFragment();
-                sortedCards.forEach(c => fragment.appendChild(c));
-                container.appendChild(fragment);
-            }
+            sortAndReorderCards(container, cards);
         }
 
-        if (refreshBtn && forceRefresh) setTimeout(() => refreshBtn.querySelector('svg').classList.remove('animate-spin'), 500);
+        if (refreshBtn && forceRefresh) {
+            setTimeout(() => {
+                const svg = refreshBtn.querySelector('svg');
+                if (svg) svg.classList.remove('animate-spin');
+            }, 500);
+        }
     };
 
     let themeControlBtns = null;
