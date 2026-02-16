@@ -28,8 +28,7 @@ globalThis.App.UI = (function() {
 
     const flattenDetailsTags = (html) => {
         if (!html) return document.createDocumentFragment();
-        // Use DOMPurify to sanitize and parse into a DocumentFragment in one pass
-        // This avoids using DOMParser which is slower and parses the whole string again
+        // Sanitize and parse directly to DocumentFragment (avoids DOMParser overhead)
         const fragment = globalThis.DOMPurify.sanitize(html, { RETURN_DOM_FRAGMENT: true });
 
         fragment.querySelectorAll('details').forEach(el => {
@@ -79,7 +78,6 @@ globalThis.App.UI = (function() {
 
             const nameSpan = document.createElement('span');
             nameSpan.className = 'truncate font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors';
-            // Use DOMPurify to create a fragment directly
             nameSpan.appendChild(globalThis.DOMPurify.sanitize(a.name, {RETURN_DOM_FRAGMENT: true}));
             div.appendChild(nameSpan);
 
@@ -347,7 +345,7 @@ globalThis.App.UI = (function() {
                 5
             );
 
-            // Pre-calculate latest values to avoid repeated DOM and string-to-number operations during sorting
+            // Pre-calculate values for efficient sorting
             const cardsWithLatest = cards.map(card => ({
                 card,
                 latest: Number(card.dataset.latest) || 0
@@ -356,7 +354,7 @@ globalThis.App.UI = (function() {
             cardsWithLatest.sort((a, b) => b.latest - a.latest);
             const sortedCards = cardsWithLatest.map(item => item.card);
 
-            // Check if the DOM order already matches the sorted order to prevent expensive layout calculations
+            // Optimization: Skip reorder if already sorted
             const currentChildren = container.children;
             let needsReorder = false;
 
@@ -424,7 +422,7 @@ globalThis.App.UI = (function() {
         document.getElementById('refresh-unit-select').value = Store.state.refreshUnit;
         document.getElementById('new-label-period-input').value = Store.state.newLabelPeriod || 7;
 
-        // Ensure UI reflects current state (store state, not necessarily current DOM state if cancelled)
+        // Reset theme controls to stored state
         updateThemeControl(Store.state.theme);
     };
 
