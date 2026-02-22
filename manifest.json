@@ -1,6 +1,7 @@
 {
   "name": "ReleaseRadar",
   "short_name": "ReleaseRadar",
+  "description": "A browser-only dashboard for tracking GitHub repository releases.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f172a",
