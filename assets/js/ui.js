@@ -78,7 +78,7 @@ globalThis.App.UI = (function() {
 
             const nameSpan = document.createElement('span');
             nameSpan.className = 'truncate font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors';
-            nameSpan.appendChild(globalThis.DOMPurify.sanitize(a.name, {RETURN_DOM_FRAGMENT: true}));
+            nameSpan.textContent = a.name;
             div.appendChild(nameSpan);
 
             link.appendChild(div);
@@ -124,7 +124,7 @@ globalThis.App.UI = (function() {
         titleLink.href = release.html_url;
         titleLink.target = '_blank';
         titleLink.className = 'group flex items-center text-lg font-bold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors break-all';
-        titleLink.appendChild(globalThis.DOMPurify.sanitize(release.tag_name, {RETURN_DOM_FRAGMENT: true}));
+        titleLink.textContent = release.tag_name;
         titleRow.appendChild(titleLink);
 
         if (isFresh) {
