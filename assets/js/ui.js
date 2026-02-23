@@ -215,23 +215,44 @@ globalThis.App.UI = (function() {
         el.dataset.name = p.name;
         el.dataset.latest = 0;
 
-        el.innerHTML = `
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 bg-white dark:bg-slate-800">
-                <div class="text-slate-800 dark:text-slate-200 p-1.5 bg-slate-50 dark:bg-slate-700 rounded-md border border-slate-200/60 dark:border-slate-600">${Utils.ICONS.GITHUB}</div>
-                <h2 class="text-lg font-semibold tracking-tight break-all flex-grow">
-                    <a href="https://github.com/${Utils.escapeAttr(p.owner)}/${Utils.escapeAttr(p.name)}" target="_blank" class="text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                        ${globalThis.DOMPurify.sanitize(p.name)}
-                    </a>
-                </h2>
-                <span class="text-xs text-slate-400 font-mono ml-auto bg-slate-50 dark:bg-slate-700 px-2 py-1 rounded hidden sm:inline-block self-center">${globalThis.DOMPurify.sanitize(p.owner)}</span>
-                <div class="delete-btn-container ml-2"></div>
-            </div>
-            <div class="p-6 content-area bg-slate-50/30 dark:bg-slate-900/30 min-h-[160px]">
-                <div class="flex flex-col items-center justify-center py-10 gap-3 text-slate-400">
-                    ${Utils.ICONS.SPINNER}
-                    <span class="text-sm font-medium animate-pulse">Checking releases...</span>
-                </div>
+        const header = document.createElement('div');
+        header.className = 'px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3 bg-white dark:bg-slate-800';
+
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'text-slate-800 dark:text-slate-200 p-1.5 bg-slate-50 dark:bg-slate-700 rounded-md border border-slate-200/60 dark:border-slate-600';
+        iconDiv.innerHTML = Utils.ICONS.GITHUB;
+        header.appendChild(iconDiv);
+
+        const h2 = document.createElement('h2');
+        h2.className = 'text-lg font-semibold tracking-tight break-all flex-grow';
+
+        const link = document.createElement('a');
+        link.href = `https://github.com/${Utils.escapeAttr(p.owner)}/${Utils.escapeAttr(p.name)}`;
+        link.target = '_blank';
+        link.className = 'text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors';
+        link.textContent = p.name;
+        h2.appendChild(link);
+        header.appendChild(h2);
+
+        const ownerSpan = document.createElement('span');
+        ownerSpan.className = 'text-xs text-slate-400 font-mono ml-auto bg-slate-50 dark:bg-slate-700 px-2 py-1 rounded hidden sm:inline-block self-center';
+        ownerSpan.textContent = p.owner;
+        header.appendChild(ownerSpan);
+
+        const deleteContainer = document.createElement('div');
+        deleteContainer.className = 'delete-btn-container ml-2';
+        header.appendChild(deleteContainer);
+
+        el.appendChild(header);
+
+        const contentArea = document.createElement('div');
+        contentArea.className = 'p-6 content-area bg-slate-50/30 dark:bg-slate-900/30 min-h-[160px]';
+        contentArea.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-10 gap-3 text-slate-400">
+                ${Utils.ICONS.SPINNER}
+                <span class="text-sm font-medium animate-pulse">Checking releases...</span>
             </div>`;
+        el.appendChild(contentArea);
 
         const deleteBtn = document.createElement('button');
         deleteBtn.className = "p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors";
@@ -241,7 +262,7 @@ globalThis.App.UI = (function() {
             e.stopPropagation();
             handleRemoveRepo(p.owner, p.name);
         });
-        el.querySelector('.delete-btn-container').appendChild(deleteBtn);
+        deleteContainer.appendChild(deleteBtn);
 
         return el;
     };
