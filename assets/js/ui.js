@@ -5,6 +5,12 @@ globalThis.App.UI = (function() {
     const Utils = globalThis.App.Utils;
     const Github = globalThis.App.Github;
 
+    // Cache static DOM elements
+    const apiKeyInput = document.getElementById('api-key-input');
+    const refreshValInput = document.getElementById('refresh-value-input');
+    const refreshUnitSelect = document.getElementById('refresh-unit-select');
+    const newLabelInput = document.getElementById('new-label-period-input');
+
     const runConcurrently = async (items, fn, limit) => {
         const results = [];
         const executing = new Set();
@@ -490,21 +496,16 @@ globalThis.App.UI = (function() {
     };
 
     const populateSettings = () => {
-        document.getElementById('api-key-input').value = Store.state.apiKey || '';
-        document.getElementById('refresh-value-input').value = Store.state.refreshRate;
-        document.getElementById('refresh-unit-select').value = Store.state.refreshUnit;
-        document.getElementById('new-label-period-input').value = Store.state.newLabelPeriod || 7;
+        apiKeyInput.value = Store.state.apiKey || '';
+        refreshValInput.value = Store.state.refreshRate;
+        refreshUnitSelect.value = Store.state.refreshUnit;
+        newLabelInput.value = Store.state.newLabelPeriod || 7;
 
         // Reset theme controls to stored state
         updateThemeControl(Store.state.theme);
     };
 
     const hasUnsavedSettings = () => {
-        const apiKeyInput = document.getElementById('api-key-input');
-        const refreshValInput = document.getElementById('refresh-value-input');
-        const refreshUnitSelect = document.getElementById('refresh-unit-select');
-        const newLabelInput = document.getElementById('new-label-period-input');
-
         if (apiKeyInput.value.trim() !== (Store.state.apiKey || '')) return true;
 
         let rVal = Number.parseInt(refreshValInput.value);
