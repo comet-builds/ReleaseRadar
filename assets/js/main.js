@@ -3,6 +3,14 @@
     const UI = globalThis.App.UI;
     const Utils = globalThis.App.Utils;
 
+    // Cache static DOM elements
+    const apiKeyInput = document.getElementById('api-key-input');
+    const refreshValInput = document.getElementById('refresh-value-input');
+    const refreshUnitSelect = document.getElementById('refresh-unit-select');
+    const newLabelInput = document.getElementById('new-label-period-input');
+    const newRepoInput = document.getElementById('new-repo-input');
+    const settingsModal = document.getElementById('settings-modal');
+
     let refreshTimer = null;
 
     const setupAutoRefresh = () => {
@@ -27,8 +35,7 @@
     };
 
     const handleAddRepo = () => {
-        const input = document.getElementById('new-repo-input');
-        let val = input.value.trim();
+        let val = newRepoInput.value.trim();
 
         val = val.replace(/\/$/, '');
 
@@ -58,16 +65,11 @@
 
         Store.addRepo(parts[0], parts[1]);
         UI.refreshUI(false);
-        input.value = '';
+        newRepoInput.value = '';
         UI.toggleModal('add-modal');
     };
 
     const saveSettingsHandler = () => {
-        const apiKeyInput = document.getElementById('api-key-input');
-        const refreshValInput = document.getElementById('refresh-value-input');
-        const refreshUnitSelect = document.getElementById('refresh-unit-select');
-        const newLabelInput = document.getElementById('new-label-period-input');
-
         const newApiKey = apiKeyInput.value.trim();
 
         if (!Store.isValidApiKey(newApiKey)) {
@@ -95,9 +97,8 @@
         setupAutoRefresh();
         UI.refreshUI(false);
 
-        const modal = document.getElementById('settings-modal');
-        modal.classList.remove('active');
-        setTimeout(() => modal.close(), 200);
+        settingsModal.classList.remove('active');
+        setTimeout(() => settingsModal.close(), 200);
     };
 
     const exportConfig = () => {
@@ -140,7 +141,7 @@
                 setupAutoRefresh();
                 Utils.showToast('Configuration imported successfully.', 'success');
 
-                if (document.getElementById('settings-modal').open) {
+                if (settingsModal.open) {
                     UI.toggleModal('settings-modal');
                 }
             } else {
@@ -216,7 +217,7 @@
     UI.applyTheme();
     UI.populateSettings();
 
-    document.getElementById('new-repo-input')?.addEventListener('keypress', function (e) {
+    newRepoInput?.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') handleAddRepo();
     });
 
