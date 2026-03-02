@@ -10,6 +10,10 @@ globalThis.App.UI = (function() {
     const refreshValInput = document.getElementById('refresh-value-input');
     const refreshUnitSelect = document.getElementById('refresh-unit-select');
     const newLabelInput = document.getElementById('new-label-period-input');
+    const projectsContainer = document.getElementById('projects-container');
+    const emptyStateContainer = document.getElementById('empty-state');
+    const headerAddRepoBtn = document.getElementById('header-add-repo-btn');
+    const refreshBtnElement = document.getElementById('refresh-btn');
 
     const runConcurrently = async (items, fn, limit) => {
         const results = [];
@@ -431,15 +435,10 @@ globalThis.App.UI = (function() {
     };
 
     const refreshUI = async (forceRefresh = false) => {
-        const container = document.getElementById('projects-container');
-        const emptyState = document.getElementById('empty-state');
-        const headerAddBtn = document.getElementById('header-add-repo-btn');
-        const refreshBtn = document.getElementById('refresh-btn');
+        updateRefreshIcon(refreshBtnElement, forceRefresh);
 
-        updateRefreshIcon(refreshBtn, forceRefresh);
-
-        if (!updateEmptyState(container, emptyState, headerAddBtn)) {
-            const cards = reconcileCards(container);
+        if (!updateEmptyState(projectsContainer, emptyStateContainer, headerAddRepoBtn)) {
+            const cards = reconcileCards(projectsContainer);
 
             await runConcurrently(
                 cards,
@@ -447,12 +446,12 @@ globalThis.App.UI = (function() {
                 5
             );
 
-            sortAndReorderCards(container, cards);
+            sortAndReorderCards(projectsContainer, cards);
         }
 
-        if (refreshBtn && forceRefresh) {
+        if (refreshBtnElement && forceRefresh) {
             setTimeout(() => {
-                const svg = refreshBtn.querySelector('svg');
+                const svg = refreshBtnElement.querySelector('svg');
                 if (svg) svg.classList.remove('animate-spin');
             }, 500);
         }
