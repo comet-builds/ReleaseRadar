@@ -13,6 +13,9 @@ globalThis.App.Store = (function() {
 
     const state = JSON.parse(localStorage.getItem(STATE_KEY)) || defaultState;
 
+    const getRepoKey = (owner, name) => `${owner.toLowerCase()}/${name.toLowerCase()}`;
+    let projectSet = new Set(state.projects.map(p => getRepoKey(p.owner, p.name)));
+
     // Migrations
     if (state.refreshRate === undefined) {
         state.refreshRate = state.refreshInterval ?? 60;
@@ -50,16 +53,21 @@ globalThis.App.Store = (function() {
 
     const addRepo = (owner, name) => {
         state.projects.push({ owner, name });
+        projectSet.add(getRepoKey(owner, name));
         saveState();
     };
 
     const removeRepo = (owner, name) => {
-        state.projects = state.projects.filter(p => !(p.owner === owner && p.name === name));
-        saveState();
+        const key = getRepoKey(owner, name);
+        if (projectSet.has(key)) {
+            projectSet.delete(key);
+            state.projects = state.projects.filter(p => getRepoKey(p.owner, p.name) !== key);
+            saveState();
+        }
     };
 
     const repoExists = (owner, name) => {
-        return state.projects.some(p => p.owner.toLowerCase() === owner.toLowerCase() && p.name.toLowerCase() === name.toLowerCase());
+        return projectSet.has(getRepoKey(owner, name));
     };
 
     const updateSettings = ({ apiKey, refreshRate, refreshUnit, newLabelPeriod, theme }) => {
@@ -77,6 +85,7 @@ globalThis.App.Store = (function() {
         }
 
         state.projects = data.projects;
+        projectSet = new Set(state.projects.map(p => getRepoKey(p.owner, p.name)));
 
         if (data.theme !== undefined) {
             state.theme = data.theme;
