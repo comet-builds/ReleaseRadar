@@ -47,8 +47,12 @@ globalThis.App.Store = (function() {
 
     const isValidApiKey = (key) => {
         if (!key) return true; // Empty is valid
-        const validPrefixes = ['ghp_', 'gho_', 'ghu_', 'ghs_', 'ghr_', 'github_pat_'];
-        return validPrefixes.some(prefix => key.startsWith(prefix));
+        return key.startsWith('ghp_') ||
+               key.startsWith('gho_') ||
+               key.startsWith('ghu_') ||
+               key.startsWith('ghs_') ||
+               key.startsWith('ghr_') ||
+               key.startsWith('github_pat_');
     };
 
     const addRepo = (owner, name) => {
