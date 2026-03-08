@@ -382,11 +382,13 @@ globalThis.App.UI = (function() {
 
     const reconcileCards = (container) => {
         const existingCards = new Map();
-        Array.from(container.children).forEach(card => {
+        const children = container.children;
+        for (let i = 0; i < children.length; i++) {
+            const card = children[i];
             if (card.dataset.owner && card.dataset.name) {
                 existingCards.set(`${card.dataset.owner}/${card.dataset.name}`, card);
             }
-        });
+        }
 
         const activeKeys = new Set();
         const newCardsFragment = document.createDocumentFragment();
