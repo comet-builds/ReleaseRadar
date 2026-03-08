@@ -105,9 +105,7 @@ globalThis.App.UI = (function() {
         return ul;
     };
 
-    const createReleaseCard = (release, label, isPre) => {
-        const freshMs = (Store.state.newLabelPeriod || 7) * 24 * 3600 * 1000;
-        const isFresh = (Date.now() - new Date(release.published_at).getTime()) <= freshMs;
+    const createReleaseCard = (release, label, isPre, isFresh) => {
         const labelColor = isPre ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400';
 
         const card = document.createElement('div');
@@ -326,7 +324,7 @@ globalThis.App.UI = (function() {
             grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6 items-start';
 
             if (stable) {
-                grid.appendChild(createReleaseCard(stable, 'Latest Stable', false));
+                grid.appendChild(createReleaseCard(stable, 'Latest Stable', false, newSignature.stableFresh));
             } else {
                 const spacer = document.createElement('div');
                 spacer.className = 'hidden md:block';
@@ -334,7 +332,7 @@ globalThis.App.UI = (function() {
             }
 
             if (pre && (!stable || pre.published_at > stable.published_at)) {
-                grid.appendChild(createReleaseCard(pre, 'Pre-release', true));
+                grid.appendChild(createReleaseCard(pre, 'Pre-release', true, newSignature.preFresh));
             }
             content.appendChild(grid);
 
