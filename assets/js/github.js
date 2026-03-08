@@ -21,14 +21,23 @@ globalThis.App.Github = (function() {
         if (res.status === 404) throw new Error('Repository not found.');
         if (!res.ok) throw new Error(`Error (${res.status})`);
 
-        const data = (await res.json()).sort((a, b) => {
-            if (b.published_at > a.published_at) return 1;
-            if (b.published_at < a.published_at) return -1;
-            return 0;
-        });
+        const data = await res.json();
 
-        let stable = data.find(r => !r.prerelease);
-        const pre = data.find(r => r.prerelease);
+        let stable = undefined;
+        let pre = undefined;
+
+        for (let i = 0; i < data.length; i++) {
+            const r = data[i];
+            if (r.prerelease) {
+                if (!pre || r.published_at > pre.published_at) {
+                    pre = r;
+                }
+            } else {
+                if (!stable || r.published_at > stable.published_at) {
+                    stable = r;
+                }
+            }
+        }
 
         if (!stable) {
             try {
