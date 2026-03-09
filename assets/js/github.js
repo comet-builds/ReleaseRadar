@@ -6,6 +6,23 @@ globalThis.App.Github = (function() {
     const GITHUB_API = 'https://api.github.com/repos/';
     const cache = new Map();
 
+    const processReleases = (data) => {
+        let stable;
+        let pre;
+
+        for (const r of data) {
+            if (r.prerelease) {
+                if (!pre || r.published_at > pre.published_at) {
+                    pre = r;
+                }
+            } else if (!stable || r.published_at > stable.published_at) {
+                stable = r;
+            }
+        }
+
+        return { stable, pre };
+    };
+
     const fetchRepoData = async (owner, name, forceRefresh = false) => {
         const cacheKey = `${owner.toLowerCase()}/${name.toLowerCase()}`;
         if (!forceRefresh && cache.has(cacheKey)) {
@@ -23,21 +40,7 @@ globalThis.App.Github = (function() {
 
         const data = await res.json();
 
-        let stable = undefined;
-        let pre = undefined;
-
-        for (let i = 0; i < data.length; i++) {
-            const r = data[i];
-            if (r.prerelease) {
-                if (!pre || r.published_at > pre.published_at) {
-                    pre = r;
-                }
-            } else {
-                if (!stable || r.published_at > stable.published_at) {
-                    stable = r;
-                }
-            }
-        }
+        let { stable, pre } = processReleases(data);
 
         if (!stable) {
             try {

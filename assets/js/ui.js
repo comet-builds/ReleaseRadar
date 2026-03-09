@@ -380,9 +380,7 @@ globalThis.App.UI = (function() {
 
     const reconcileCards = (container) => {
         const existingCards = new Map();
-        const children = container.children;
-        for (let i = 0; i < children.length; i++) {
-            const card = children[i];
+        for (const card of container.children) {
             if (card.dataset.owner && card.dataset.name) {
                 existingCards.set(`${card.dataset.owner}/${card.dataset.name}`, card);
             }
