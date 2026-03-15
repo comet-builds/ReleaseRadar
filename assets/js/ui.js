@@ -71,6 +71,8 @@ globalThis.App.UI = (function() {
         const ul = document.createElement('ul');
         ul.className = 'space-y-2 mt-3';
 
+        const fragment = document.createDocumentFragment();
+
         assets.forEach(a => {
             const li = document.createElement('li');
 
@@ -99,9 +101,10 @@ globalThis.App.UI = (function() {
             link.appendChild(sizeSpan);
 
             li.appendChild(link);
-            ul.appendChild(li);
+            fragment.appendChild(li);
         });
 
+        ul.appendChild(fragment);
         return ul;
     };
 
