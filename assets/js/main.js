@@ -41,7 +41,7 @@
 
         if (val.includes('github.com')) {
             const match = val.match(/github\.com\/([^/?#]+)\/([^/?#]+)/);
-            if (match && match[1] && match[2]) {
+            if (match?.[1] && match?.[2]) {
                 val = `${match[1]}/${match[2]}`;
             }
         }
