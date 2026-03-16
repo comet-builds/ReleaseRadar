@@ -28,6 +28,12 @@ globalThis.App.Utils = (function() {
         return dateFormatter.format(date) + ' • ' + timeFormatter.format(date);
     };
 
+    // Parse SVG icons once to avoid innerHTML overhead later
+    const parsedIcons = {
+        error: DOMPurify.sanitize(ICONS.TOAST_ERROR, { RETURN_DOM_FRAGMENT: true }).firstChild,
+        success: DOMPurify.sanitize(ICONS.TOAST_SUCCESS, { RETURN_DOM_FRAGMENT: true }).firstChild
+    };
+
     const showToast = (message, type = 'success') => {
         const container = document.getElementById('toast-container');
 
@@ -48,9 +54,17 @@ globalThis.App.Utils = (function() {
 
         el.className = classes;
 
-        const icon = type === 'error' ? ICONS.TOAST_ERROR : ICONS.TOAST_SUCCESS;
+        const iconNode = type === 'error' ? parsedIcons.error : parsedIcons.success;
 
-        el.innerHTML = `${icon}<span class="text-sm font-medium break-words flex-grow">${message}</span>`;
+        if (iconNode) {
+            el.appendChild(iconNode.cloneNode(true));
+        }
+
+        const messageSpan = document.createElement('span');
+        messageSpan.className = "text-sm font-medium break-words flex-grow";
+        messageSpan.textContent = message;
+
+        el.appendChild(messageSpan);
 
         container.appendChild(el);
 
