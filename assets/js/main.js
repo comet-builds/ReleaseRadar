@@ -39,16 +39,11 @@
 
         val = val.replace(/\/$/, '');
 
-        try {
-            if (val.includes('github.com')) {
-                const url = new URL(val.startsWith('http') ? val : `https://${val}`);
-                const parts = url.pathname.split('/').filter(Boolean);
-                if (parts.length >= 2) {
-                    val = `${parts[0]}/${parts[1]}`;
-                }
+        if (val.includes('github.com')) {
+            const match = val.match(/github\.com\/([^/?#]+)\/([^/?#]+)/);
+            if (match && match[1] && match[2]) {
+                val = `${match[1]}/${match[2]}`;
             }
-        } catch (e) {
-            console.error('Invalid URL:', e);
         }
 
         const parts = val.split('/');
