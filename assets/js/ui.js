@@ -416,21 +416,15 @@ globalThis.App.UI = (function() {
     };
 
     const sortAndReorderCards = (container, cards) => {
-        const cardsWithLatest = cards.map(card => ({
-            card,
-            latest: Number(card.dataset.latest) || 0
-        }));
-
-        cardsWithLatest.sort((a, b) => b.latest - a.latest);
-        const sortedCards = cardsWithLatest.map(item => item.card);
+        cards.sort((a, b) => (Number(b.dataset.latest) || 0) - (Number(a.dataset.latest) || 0));
 
         const currentChildren = container.children;
-        const needsReorder = sortedCards.length !== currentChildren.length ||
-                             sortedCards.some((card, i) => card !== currentChildren[i]);
+        const needsReorder = cards.length !== currentChildren.length ||
+                             cards.some((card, i) => card !== currentChildren[i]);
 
         if (needsReorder) {
             const fragment = document.createDocumentFragment();
-            for (const c of sortedCards) {
+            for (const c of cards) {
                 fragment.appendChild(c);
             }
             container.appendChild(fragment);
