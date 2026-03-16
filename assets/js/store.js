@@ -14,7 +14,10 @@ globalThis.App.Store = (function() {
     const state = JSON.parse(localStorage.getItem(STATE_KEY)) || defaultState;
 
     const getRepoKey = (owner, name) => `${owner.toLowerCase()}/${name.toLowerCase()}`;
-    let projectSet = new Set(state.projects.map(p => getRepoKey(p.owner, p.name)));
+    let projectSet = new Set();
+    for (const p of state.projects) {
+        projectSet.add(getRepoKey(p.owner, p.name));
+    }
 
     // Migrations
     if (state.refreshRate === undefined) {
@@ -89,7 +92,10 @@ globalThis.App.Store = (function() {
         }
 
         state.projects = data.projects;
-        projectSet = new Set(state.projects.map(p => getRepoKey(p.owner, p.name)));
+        projectSet = new Set();
+        for (const p of state.projects) {
+            projectSet.add(getRepoKey(p.owner, p.name));
+        }
 
         if (data.theme !== undefined) {
             state.theme = data.theme;
