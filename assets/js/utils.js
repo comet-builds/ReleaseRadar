@@ -28,7 +28,6 @@ globalThis.App.Utils = (function() {
         return dateFormatter.format(date) + ' • ' + timeFormatter.format(date);
     };
 
-    // Parse SVG icons once to avoid innerHTML overhead later
     const parsedIcons = {
         error: DOMPurify.sanitize(ICONS.TOAST_ERROR, { RETURN_DOM_FRAGMENT: true }).firstChild,
         success: DOMPurify.sanitize(ICONS.TOAST_SUCCESS, { RETURN_DOM_FRAGMENT: true }).firstChild
