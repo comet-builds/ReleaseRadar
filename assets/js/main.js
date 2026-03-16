@@ -161,7 +161,7 @@
         document.getElementById('add-modal-close-btn')?.addEventListener('click', () => UI.toggleModal('add-modal'));
         document.getElementById('settings-modal-close-btn')?.addEventListener('click', () => UI.toggleModal('settings-modal'));
 
-        document.querySelectorAll('dialog').forEach(dialog => {
+        for (const dialog of document.querySelectorAll('dialog')) {
             dialog.addEventListener('click', (e) => {
                 if (e.target === dialog) UI.toggleModal(dialog.id);
             });
@@ -169,15 +169,15 @@
                 e.preventDefault();
                 UI.toggleModal(dialog.id);
             });
-        });
+        }
 
         document.getElementById('add-repo-confirm-btn')?.addEventListener('click', handleAddRepo);
 
-        document.querySelectorAll('[data-theme-value]').forEach(btn => {
+        for (const btn of document.querySelectorAll('[data-theme-value]')) {
             btn.addEventListener('click', () => {
                 UI.applyTheme(btn.dataset.themeValue);
             });
-        });
+        }
 
         // Listen for system theme changes if in device mode
         globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {

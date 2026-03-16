@@ -41,7 +41,7 @@ globalThis.App.UI = (function() {
         // Sanitize and parse directly to DocumentFragment (avoids DOMParser overhead)
         const fragment = globalThis.DOMPurify.sanitize(html, { RETURN_DOM_FRAGMENT: true });
 
-        fragment.querySelectorAll('details').forEach(el => {
+        for (const el of fragment.querySelectorAll('details')) {
             const div = document.createElement('div');
             div.className = 'border-l-2 border-slate-200 dark:border-slate-700 pl-4 my-3 space-y-2';
 
@@ -55,7 +55,7 @@ globalThis.App.UI = (function() {
                 }
             }
             el.parentNode.replaceChild(div, el);
-        });
+        }
 
         return fragment;
     };
@@ -73,7 +73,7 @@ globalThis.App.UI = (function() {
 
         const fragment = document.createDocumentFragment();
 
-        assets.forEach(a => {
+        for (const a of assets) {
             const li = document.createElement('li');
 
             const link = document.createElement('a');
@@ -102,7 +102,7 @@ globalThis.App.UI = (function() {
 
             li.appendChild(link);
             fragment.appendChild(li);
-        });
+        }
 
         ul.appendChild(fragment);
         return ul;
@@ -392,7 +392,7 @@ globalThis.App.UI = (function() {
         const activeKeys = new Set();
         const newCardsFragment = document.createDocumentFragment();
 
-        Store.state.projects.forEach(p => {
+        for (const p of Store.state.projects) {
             const key = `${p.owner}/${p.name}`;
             activeKeys.add(key);
 
@@ -401,16 +401,16 @@ globalThis.App.UI = (function() {
                 newCardsFragment.appendChild(newCard);
                 existingCards.set(key, newCard);
             }
-        });
+        }
 
         container.appendChild(newCardsFragment);
 
-        existingCards.forEach((card, key) => {
+        for (const [key, card] of existingCards.entries()) {
             if (!activeKeys.has(key)) {
                 card.remove();
                 existingCards.delete(key);
             }
-        });
+        }
 
         return Array.from(existingCards.values());
     };
@@ -430,7 +430,9 @@ globalThis.App.UI = (function() {
 
         if (needsReorder) {
             const fragment = document.createDocumentFragment();
-            sortedCards.forEach(c => fragment.appendChild(c));
+            for (const c of sortedCards) {
+                fragment.appendChild(c);
+            }
             container.appendChild(fragment);
         }
     };
@@ -463,7 +465,7 @@ globalThis.App.UI = (function() {
         if (!themeControlBtns) {
             themeControlBtns = document.querySelectorAll('[data-theme-value]');
         }
-        themeControlBtns.forEach(btn => {
+        for (const btn of themeControlBtns) {
             const isActive = btn.dataset.themeValue === activeTheme;
             if (isActive) {
                 btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-slate-700', 'dark:text-white');
@@ -472,7 +474,7 @@ globalThis.App.UI = (function() {
                 btn.classList.remove('bg-white', 'text-slate-900', 'shadow-sm', 'dark:bg-slate-700', 'dark:text-white');
                 btn.classList.add('text-slate-500', 'hover:text-slate-900', 'dark:text-slate-400', 'dark:hover:text-white');
             }
-        });
+        }
     };
 
     const applyTheme = (themeName = null) => {
