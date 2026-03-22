@@ -416,7 +416,12 @@ globalThis.App.UI = (function() {
     };
 
     const sortAndReorderCards = (container, cards) => {
-        cards.sort((a, b) => (Number(b.dataset.latest) || 0) - (Number(a.dataset.latest) || 0));
+        const parsedValues = new Map();
+        for (const card of cards) {
+            parsedValues.set(card, Number(card.dataset.latest) || 0);
+        }
+
+        cards.sort((a, b) => parsedValues.get(b) - parsedValues.get(a));
 
         const currentChildren = container.children;
         const needsReorder = cards.length !== currentChildren.length ||
