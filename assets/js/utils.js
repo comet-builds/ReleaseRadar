@@ -33,12 +33,14 @@ globalThis.App.Utils = (function() {
         success: DOMPurify.sanitize(ICONS.TOAST_SUCCESS, { RETURN_DOM_FRAGMENT: true }).firstChild
     };
 
-    const showToast = (message, type = 'success') => {
-        const container = document.getElementById('toast-container');
+    let toastContainer;
 
-        if (container?.hidePopover && container?.showPopover) {
-            container.hidePopover();
-            container.showPopover();
+    const showToast = (message, type = 'success') => {
+        toastContainer = toastContainer || document.getElementById('toast-container');
+
+        if (toastContainer?.hidePopover && toastContainer?.showPopover) {
+            toastContainer.hidePopover();
+            toastContainer.showPopover();
         }
 
         const el = document.createElement('div');
@@ -65,7 +67,7 @@ globalThis.App.Utils = (function() {
 
         el.appendChild(messageSpan);
 
-        container.appendChild(el);
+        toastContainer.appendChild(el);
 
         requestAnimationFrame(() => {
             el.classList.remove('translate-y-2', 'opacity-0');
