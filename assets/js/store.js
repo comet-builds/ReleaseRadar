@@ -68,7 +68,12 @@ globalThis.App.Store = (function() {
         const key = getRepoKey(owner, name);
         if (projectSet.has(key)) {
             projectSet.delete(key);
-            state.projects = state.projects.filter(p => getRepoKey(p.owner, p.name) !== key);
+            const lowerOwner = owner.toLowerCase();
+            const lowerName = name.toLowerCase();
+            const index = state.projects.findIndex(p => p.owner.toLowerCase() === lowerOwner && p.name.toLowerCase() === lowerName);
+            if (index !== -1) {
+                state.projects.splice(index, 1);
+            }
             saveState();
         }
     };
