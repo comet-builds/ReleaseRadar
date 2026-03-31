@@ -48,7 +48,7 @@ globalThis.App.UI = (function() {
             // Move children to new div, excluding summary
             while (el.firstChild) {
                 const node = el.firstChild;
-                if (node.nodeName.toLowerCase() === 'summary') {
+                if (node.nodeName === 'SUMMARY') {
                     node.remove();
                 } else {
                     div.appendChild(node);
