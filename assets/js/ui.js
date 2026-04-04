@@ -168,7 +168,7 @@ globalThis.App.UI = (function() {
         const btnText = document.createElement('span');
         btnText.textContent = 'View Assets & Notes';
         toggleBtn.appendChild(btnText);
-        toggleBtn.insertAdjacentHTML('beforeend', Utils.ICONS.CHEVRON);
+        toggleBtn.appendChild(Utils.parsedIcons.chevron.cloneNode(true));
 
         topSection.appendChild(toggleBtn);
         card.appendChild(topSection);
@@ -231,7 +231,7 @@ globalThis.App.UI = (function() {
 
         const iconDiv = document.createElement('div');
         iconDiv.className = 'text-slate-800 dark:text-slate-200 p-1.5 bg-slate-50 dark:bg-slate-700 rounded-md border border-slate-200/60 dark:border-slate-600';
-        iconDiv.innerHTML = Utils.ICONS.GITHUB;
+        iconDiv.appendChild(Utils.parsedIcons.github.cloneNode(true));
         header.appendChild(iconDiv);
 
         const h2 = document.createElement('h2');
@@ -268,7 +268,7 @@ globalThis.App.UI = (function() {
         const deleteBtn = document.createElement('button');
         deleteBtn.className = "p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors";
         deleteBtn.title = "Remove Repository";
-        deleteBtn.innerHTML = Utils.ICONS.TRASH;
+        deleteBtn.appendChild(Utils.parsedIcons.trash.cloneNode(true));
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             handleRemoveRepo(p.owner, p.name);
@@ -359,7 +359,8 @@ globalThis.App.UI = (function() {
 
     const updateRefreshIcon = (btn, forceRefresh) => {
         if (!btn) return;
-        btn.innerHTML = Utils.ICONS.REFRESH;
+        btn.innerHTML = '';
+        btn.appendChild(Utils.parsedIcons.refresh.cloneNode(true));
         if (forceRefresh) {
             const svg = btn.querySelector('svg');
             if (svg) svg.classList.add('animate-spin');
