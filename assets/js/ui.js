@@ -85,7 +85,7 @@ globalThis.App.UI = (function() {
 
             const iconDiv = document.createElement('div');
             iconDiv.className = 'mr-3 flex-shrink-0';
-            iconDiv.innerHTML = Utils.ICONS.DOWNLOAD;
+            iconDiv.appendChild(Utils.parsedIcons.download.cloneNode(true));
             div.appendChild(iconDiv);
 
             const nameSpan = document.createElement('span');

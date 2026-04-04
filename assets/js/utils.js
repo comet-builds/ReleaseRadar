@@ -30,7 +30,12 @@ globalThis.App.Utils = (function() {
 
     const parsedIcons = {
         error: DOMPurify.sanitize(ICONS.TOAST_ERROR, { RETURN_DOM_FRAGMENT: true }).firstChild,
-        success: DOMPurify.sanitize(ICONS.TOAST_SUCCESS, { RETURN_DOM_FRAGMENT: true }).firstChild
+        success: DOMPurify.sanitize(ICONS.TOAST_SUCCESS, { RETURN_DOM_FRAGMENT: true }).firstChild,
+        download: (() => {
+            const t = document.createElement('template');
+            t.innerHTML = ICONS.DOWNLOAD;
+            return t.content.firstElementChild;
+        })()
     };
 
     let toastContainer;
@@ -79,5 +84,5 @@ globalThis.App.Utils = (function() {
         }, 4000);
     };
 
-    return { ICONS, forceReflow, escapeAttr, formatDate, showToast };
+    return { ICONS, parsedIcons, forceReflow, escapeAttr, formatDate, showToast };
 })();
