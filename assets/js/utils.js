@@ -28,14 +28,20 @@ globalThis.App.Utils = (function() {
         return dateFormatter.format(date) + ' • ' + timeFormatter.format(date);
     };
 
+    const parseIcon = (svgString) => {
+        const t = document.createElement('template');
+        t.innerHTML = svgString;
+        return t.content.firstElementChild;
+    };
+
     const parsedIcons = {
         error: DOMPurify.sanitize(ICONS.TOAST_ERROR, { RETURN_DOM_FRAGMENT: true }).firstChild,
         success: DOMPurify.sanitize(ICONS.TOAST_SUCCESS, { RETURN_DOM_FRAGMENT: true }).firstChild,
-        download: (() => {
-            const t = document.createElement('template');
-            t.innerHTML = ICONS.DOWNLOAD;
-            return t.content.firstElementChild;
-        })()
+        download: parseIcon(ICONS.DOWNLOAD),
+        github: parseIcon(ICONS.GITHUB),
+        chevron: parseIcon(ICONS.CHEVRON),
+        trash: parseIcon(ICONS.TRASH),
+        refresh: parseIcon(ICONS.REFRESH)
     };
 
     let toastContainer;
