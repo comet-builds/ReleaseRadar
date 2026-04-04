@@ -429,6 +429,7 @@ globalThis.App.UI = (function() {
                              cards.some((card, i) => card !== currentChildren[i]);
 
         if (needsReorder) {
+            container.replaceChildren();
             const fragment = document.createDocumentFragment();
             for (const c of cards) {
                 fragment.appendChild(c);
