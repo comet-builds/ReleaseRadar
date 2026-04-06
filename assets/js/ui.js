@@ -359,11 +359,18 @@ globalThis.App.UI = (function() {
 
     const updateRefreshIcon = (btn, forceRefresh) => {
         if (!btn) return;
-        btn.innerHTML = '';
-        btn.appendChild(Utils.parsedIcons.refresh.cloneNode(true));
-        if (forceRefresh) {
-            const svg = btn.querySelector('svg');
-            if (svg) svg.classList.add('animate-spin');
+        let svg = btn.querySelector('svg');
+        if (!svg) {
+            btn.innerHTML = '';
+            btn.appendChild(Utils.parsedIcons.refresh.cloneNode(true));
+            svg = btn.querySelector('svg');
+        }
+        if (svg) {
+            if (forceRefresh) {
+                svg.classList.add('animate-spin');
+            } else {
+                svg.classList.remove('animate-spin');
+            }
         }
     };
 
