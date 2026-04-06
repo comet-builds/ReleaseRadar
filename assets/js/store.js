@@ -14,9 +14,9 @@ globalThis.App.Store = (function() {
     const state = JSON.parse(localStorage.getItem(STATE_KEY)) || defaultState;
 
     const getRepoKey = (owner, name) => `${owner.toLowerCase()}/${name.toLowerCase()}`;
-    let projectSet = new Set();
+    let projectMap = new Map();
     for (const p of state.projects) {
-        projectSet.add(getRepoKey(p.owner, p.name));
+        projectMap.set(getRepoKey(p.owner, p.name), p);
     }
 
     // Migrations
@@ -59,18 +59,18 @@ globalThis.App.Store = (function() {
     };
 
     const addRepo = (owner, name) => {
-        state.projects.push({ owner, name });
-        projectSet.add(getRepoKey(owner, name));
+        const p = { owner, name };
+        state.projects.push(p);
+        projectMap.set(getRepoKey(owner, name), p);
         saveState();
     };
 
     const removeRepo = (owner, name) => {
         const key = getRepoKey(owner, name);
-        if (projectSet.has(key)) {
-            projectSet.delete(key);
-            const lowerOwner = owner.toLowerCase();
-            const lowerName = name.toLowerCase();
-            const index = state.projects.findIndex(p => p.owner.toLowerCase() === lowerOwner && p.name.toLowerCase() === lowerName);
+        const p = projectMap.get(key);
+        if (p) {
+            projectMap.delete(key);
+            const index = state.projects.indexOf(p);
             if (index !== -1) {
                 state.projects.splice(index, 1);
             }
@@ -79,7 +79,7 @@ globalThis.App.Store = (function() {
     };
 
     const repoExists = (owner, name) => {
-        return projectSet.has(getRepoKey(owner, name));
+        return projectMap.has(getRepoKey(owner, name));
     };
 
     const updateSettings = ({ apiKey, refreshRate, refreshUnit, newLabelPeriod, theme }) => {
@@ -97,9 +97,9 @@ globalThis.App.Store = (function() {
         }
 
         state.projects = data.projects;
-        projectSet = new Set();
+        projectMap = new Map();
         for (const p of state.projects) {
-            projectSet.add(getRepoKey(p.owner, p.name));
+            projectMap.set(getRepoKey(p.owner, p.name), p);
         }
 
         if (data.theme !== undefined) {
