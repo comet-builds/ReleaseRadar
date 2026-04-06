@@ -14,6 +14,7 @@ globalThis.App.UI = (function() {
     const emptyStateContainer = document.getElementById('empty-state');
     const headerAddRepoBtn = document.getElementById('header-add-repo-btn');
     const refreshBtnElement = document.getElementById('refresh-btn');
+    const darkMediaQuery = globalThis.matchMedia('(prefers-color-scheme: dark)');
 
     const runConcurrently = async (items, fn, limit) => {
         const results = [];
@@ -484,7 +485,7 @@ globalThis.App.UI = (function() {
         let isDark = false;
 
         if (targetTheme === 'device') {
-            isDark = globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
+            isDark = darkMediaQuery.matches;
         } else {
             isDark = targetTheme === 'dark';
         }
