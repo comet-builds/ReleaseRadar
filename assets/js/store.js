@@ -19,18 +19,12 @@ globalThis.App.Store = (function() {
         projectMap.set(getRepoKey(p.owner, p.name), p);
     }
 
-    // Migrations
     if (state.refreshRate === undefined) {
-        state.refreshRate = state.refreshInterval ?? 60;
+        state.refreshRate = 60;
         state.refreshUnit = 'minutes';
-        delete state.refreshInterval;
     }
     if (state.newLabelPeriod === undefined) {
         state.newLabelPeriod = 7;
-    }
-    if (state.darkMode !== undefined) {
-        state.theme = state.darkMode ? 'dark' : 'light';
-        delete state.darkMode;
     }
     if (state.theme === undefined) {
         state.theme = 'device';
@@ -104,18 +98,11 @@ globalThis.App.Store = (function() {
 
         if (data.theme !== undefined) {
             state.theme = data.theme;
-        } else if (data.darkMode !== undefined) {
-            state.theme = data.darkMode ? 'dark' : 'light';
         }
 
         if (data.refreshRate !== undefined) state.refreshRate = data.refreshRate;
         if (data.refreshUnit !== undefined) state.refreshUnit = data.refreshUnit;
         if (data.newLabelPeriod !== undefined) state.newLabelPeriod = data.newLabelPeriod;
-
-        if (data.refreshInterval !== undefined && (data.refreshRate === undefined || data.refreshRate === 'undefined')) {
-            state.refreshRate = data.refreshInterval;
-            state.refreshUnit = 'minutes';
-        }
 
         saveState();
         return true;
