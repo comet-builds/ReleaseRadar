@@ -477,7 +477,9 @@ globalThis.App.UI = (function() {
     };
 
     let themeControlBtns = null;
+    let currentSelectedTheme = 'device';
     const updateThemeControl = (activeTheme) => {
+        currentSelectedTheme = activeTheme;
         if (!themeControlBtns) {
             themeControlBtns = document.querySelectorAll('[data-theme-value]');
         }
@@ -537,10 +539,7 @@ globalThis.App.UI = (function() {
         const stateLabelPeriod = Store.state.newLabelPeriod === undefined ? 7 : Store.state.newLabelPeriod;
         if (lVal !== stateLabelPeriod) return true;
 
-        const activeBtn = document.querySelector('[data-theme-value].bg-white');
-        const currentTheme = activeBtn ? activeBtn.dataset.themeValue : 'device';
-
-        if (currentTheme !== Store.state.theme) return true;
+        if (currentSelectedTheme !== Store.state.theme) return true;
 
         return false;
     };
