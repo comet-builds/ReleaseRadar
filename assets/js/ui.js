@@ -432,8 +432,17 @@ globalThis.App.UI = (function() {
         cards.sort((a, b) => parsedValues.get(b) - parsedValues.get(a));
 
         const currentChildren = container.children;
-        const needsReorder = cards.length !== currentChildren.length ||
-                             cards.some((card, i) => card !== currentChildren[i]);
+        let needsReorder = cards.length !== currentChildren.length;
+        if (!needsReorder) {
+            let i = 0;
+            for (const card of cards) {
+                if (card !== currentChildren[i]) {
+                    needsReorder = true;
+                    break;
+                }
+                i++;
+            }
+        }
 
         if (needsReorder) {
             container.replaceChildren();
