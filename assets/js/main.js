@@ -201,7 +201,7 @@
         try {
             toastContainer.popover = "manual";
         } catch (e) {
-            console.warn('Popover API not supported', e);
+            // Silently handle unsupported Popover API
         }
 
         if (toastContainer.showPopover) {
