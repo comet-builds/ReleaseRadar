@@ -19,11 +19,9 @@ globalThis.App.Store = (function() {
         projectMap.set(getRepoKey(p.owner, p.name), p);
     }
 
-    // Migrations
     if (state.refreshRate === undefined) {
-        state.refreshRate = state.refreshInterval ?? 60;
+        state.refreshRate = 60;
         state.refreshUnit = 'minutes';
-        delete state.refreshInterval;
     }
     if (state.newLabelPeriod === undefined) {
         state.newLabelPeriod = 7;
@@ -105,11 +103,6 @@ globalThis.App.Store = (function() {
         if (data.refreshRate !== undefined) state.refreshRate = data.refreshRate;
         if (data.refreshUnit !== undefined) state.refreshUnit = data.refreshUnit;
         if (data.newLabelPeriod !== undefined) state.newLabelPeriod = data.newLabelPeriod;
-
-        if (data.refreshInterval !== undefined && (data.refreshRate === undefined || data.refreshRate === 'undefined')) {
-            state.refreshRate = data.refreshInterval;
-            state.refreshUnit = 'minutes';
-        }
 
         saveState();
         return true;
