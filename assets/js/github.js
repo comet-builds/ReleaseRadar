@@ -47,7 +47,7 @@ globalThis.App.Github = (function() {
                 const stableRes = await fetch(`${GITHUB_API}${owner}/${name}/releases/latest`, { headers });
                 if (stableRes.ok) stable = await stableRes.json();
             } catch (e) {
-                console.warn('Fallback fetch failed', e);
+                // Ignore fallback fetch failure
             }
         }
 
