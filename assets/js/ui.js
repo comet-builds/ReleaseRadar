@@ -353,8 +353,9 @@ globalThis.App.UI = (function() {
             content.innerHTML = `
                 <div class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm border border-red-100 dark:border-red-900/30 flex items-center gap-3">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <strong>Error:</strong> ${err.message}
+                    <strong>Error:</strong> <span class="error-message"></span>
                 </div>`;
+            content.querySelector('.error-message').textContent = err.message;
         }
     };
 
