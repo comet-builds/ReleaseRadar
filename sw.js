@@ -8,7 +8,12 @@ const ASSETS = [
   './assets/js/store.js',
   './assets/js/ui.js',
   './assets/js/utils.js',
-  './assets/css/styles.css'
+  './assets/css/styles.css',
+  './assets/icons/icon-180.png',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/icons/icon-maskable-192.png',
+  './assets/icons/icon-maskable-512.png'
 ];
 
 globalThis.addEventListener('install', (event) => {
