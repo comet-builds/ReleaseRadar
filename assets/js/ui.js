@@ -434,13 +434,12 @@ globalThis.App.UI = (function() {
         const currentChildren = container.children;
         let needsReorder = cards.length !== currentChildren.length;
         if (!needsReorder) {
-            let i = 0;
-            for (const card of cards) {
-                if (card !== currentChildren[i]) {
+            const len = cards.length;
+            for (let i = 0; i < len; i++) {
+                if (cards[i] !== currentChildren[i]) {
                     needsReorder = true;
                     break;
                 }
-                i++;
             }
         }
 
