@@ -28,10 +28,6 @@ globalThis.App.Store = (function() {
     if (state.newLabelPeriod === undefined) {
         state.newLabelPeriod = 7;
     }
-    if (state.darkMode !== undefined) {
-        state.theme = state.darkMode ? 'dark' : 'light';
-        delete state.darkMode;
-    }
     if (state.theme === undefined) {
         state.theme = 'device';
     }
@@ -104,8 +100,6 @@ globalThis.App.Store = (function() {
 
         if (data.theme !== undefined) {
             state.theme = data.theme;
-        } else if (data.darkMode !== undefined) {
-            state.theme = data.darkMode ? 'dark' : 'light';
         }
 
         if (data.refreshRate !== undefined) state.refreshRate = data.refreshRate;
