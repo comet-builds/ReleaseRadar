@@ -362,9 +362,8 @@ globalThis.App.UI = (function() {
         if (!btn) return;
         let svg = btn.querySelector('svg');
         if (!svg) {
-            btn.innerHTML = '';
-            btn.appendChild(Utils.parsedIcons.refresh.cloneNode(true));
-            svg = btn.querySelector('svg');
+            svg = Utils.parsedIcons.refresh.cloneNode(true);
+            btn.replaceChildren(svg);
         }
         if (svg) {
             if (forceRefresh) {
